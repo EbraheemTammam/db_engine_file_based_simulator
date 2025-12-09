@@ -1,4 +1,5 @@
-import { KEYWORDS, Token, TokenType } from "./token";
+import { KEYWORDS } from "src/constants/keywords";
+import { Token, TokenType } from "src/interfaces/token";
 
 export class Lexer {
     private _tokens: Token[];
@@ -216,7 +217,8 @@ export class Lexer {
         while (
             iterator !== this._buffer_size && (
                 Lexer.is_alpha(this._buffer[iterator + 1]) || 
-                Lexer.is_number(this._buffer[iterator + 1])
+                Lexer.is_number(this._buffer[iterator + 1]) ||
+                this._buffer[iterator + 1] == '_'
             )
         ) ++iterator;
         let slice: string = this._buffer.slice(this._cursor, iterator + 1);
