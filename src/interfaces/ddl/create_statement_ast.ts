@@ -19,7 +19,6 @@ export interface CreateTableColumnStatement {
     constraints?: {
         default?: string | number | boolean,
         pk: boolean,
-        serial: boolean,
         unique: boolean,
         not_null: boolean,
         reference?: string
