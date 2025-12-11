@@ -46,6 +46,8 @@ export class DDLParser implements Parser {
                 return this.parse_alter();
             case 'DROP':
                 return this.parse_drop();
+            case 'TRUNCATE':
+                return this.parse_truncate_table();
             default:
                 throw new Error(`syntax error: unexpected token '${next.value}', expected a keyword`);
         }
@@ -523,6 +525,17 @@ export class DDLParser implements Parser {
                 type: "DropIndexStatement",
                 name: name.value
             }
+        }
+    }
+
+    private parse_truncate_table() : TruncateTableStatement {
+        this.consume(TokenType.KEYWORD, 'TRUNCATE');
+        let table_name: Token = this.consume(TokenType.IDENTIFIER);
+        if (typeof(table_name.value) !== "string") 
+            throw new Error(`syntax error: expected identifier, got '${table_name.value}'`);
+        return {
+            type: "TruncateTableStatement",
+            name: table_name.value
         }
     }
 
