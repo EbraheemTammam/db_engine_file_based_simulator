@@ -21,6 +21,7 @@ import {
     RenameIndexStatement
 } from "src/interfaces/ddl/alter_statement_ast";
 import { DropDatabaseStatement, DropIndexStatement, DropStatement, DropTableStatement } from "src/interfaces/ddl/drop_statement_ast";
+import { TruncateTableStatement } from "src/interfaces/ddl/truncate_statement_ast";
 
 export class DDLParser implements Parser {
     private _lexemes: Token[];
@@ -495,7 +496,7 @@ export class DDLParser implements Parser {
             this.consume(TokenType.KEYWORD, 'DATABASE');
             let name: Token = this.consume(TokenType.IDENTIFIER);
             if (typeof(name.value) !== "string") 
-                throw new Error(`syntax error: expected identifier, got '${next.value}'`);
+                throw new Error(`syntax error: expected identifier, got '${name.value}'`);
             return {
                 type: "DropDatabaseStatement",
                 name: name.value
@@ -506,7 +507,7 @@ export class DDLParser implements Parser {
             this.consume(TokenType.KEYWORD, 'TABLE');
             let name: Token = this.consume(TokenType.IDENTIFIER);
             if (typeof(name.value) !== "string") 
-                throw new Error(`syntax error: expected identifier, got '${next.value}'`);
+                throw new Error(`syntax error: expected identifier, got '${name.value}'`);
             return {
                 type: "DropTableStatement",
                 name: name.value
@@ -517,7 +518,7 @@ export class DDLParser implements Parser {
             this.consume(TokenType.KEYWORD, 'INDEX');
             let name: Token = this.consume(TokenType.IDENTIFIER);
             if (typeof(name.value) !== "string") 
-                throw new Error(`syntax error: expected identifier, got '${next.value}'`);
+                throw new Error(`syntax error: expected identifier, got '${name.value}'`);
             return {
                 type: "DropIndexStatement",
                 name: name.value
