@@ -1,3 +1,3 @@
-export interface Parser {
+export interface IParser {
     parse();
 }
