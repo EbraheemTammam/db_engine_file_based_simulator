@@ -1,15 +1,15 @@
 import { Token, TokenType } from "src/interfaces/token";
-import { Parser } from "./parser";
-import { CreateStatementParser } from "./parsers/ddl/create_statement_parser";
-import { AlterStatementParser } from "./parsers/ddl/alter_statement_parser";
-import { DropStatementParser } from "./parsers/ddl/drop_statement_parser";
-import { TruncateStatementParser } from "./parsers/ddl/truncate_statement_parser";
+import { Parser } from "../parser";
+import { CreateStatementParser } from "./ddl/create_statement_parser";
+import { AlterStatementParser } from "./ddl/alter_statement_parser";
+import { DropStatementParser } from "./ddl/drop_statement_parser";
+import { TruncateStatementParser } from "./ddl/truncate_statement_parser";
 
 export class DDLParserFactory {
     public build(lexemes: Token[]) : Parser {
         let peek: Token = lexemes[0];
         if (peek.type !== TokenType.KEYWORD) {
-            throw new Error(`syntax error: unexpected ${peek.value}, expected a keyword`)
+            throw new Error(`syntax error: unexpected ${peek.value}, expected a KEYWORD`)
         }
         switch (peek.value) {
             case 'CREATE':
