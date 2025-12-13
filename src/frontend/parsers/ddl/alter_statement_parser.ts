@@ -1,13 +1,8 @@
 import { Parser } from "src/frontend/parser";
 import { Token, TokenType } from "src/interfaces/token";
 import { 
-    AlterStatement, 
-    AlterTableAddColumnStatement, 
-    AlterTableAlterColumnDataTypeStatement, 
-    AlterTableAlterColumnDefaultValueStatement, 
-    AlterTableAlterColumnNotNullStatement, 
-    AlterTableDropColumnStatement, 
-    AlterTableRenameColumnStatement, 
+    AlterStatement,
+    AlterTableColumnStatement,
     RenameDatabaseStatement,
     RenameIndexStatement
 } from "src/interfaces/ddl/alter_statement_ast";
@@ -64,7 +59,7 @@ export class AlterStatementParser extends Parser {
                 throw new Error(`syntax error: unexpected token '${next.value}', expected KEYWORD`);
         }
                     
-        function parse_alter_table_add_column(table_name: Token) : AlterTableAddColumnStatement {
+        function parse_alter_table_add_column(table_name: Token) : AlterTableColumnStatement {
             if (typeof(table_name.value) !== "string") {
                 throw new Error(`syntax error: unexpected token '${table_name.value}', expected identifer`);
             }
@@ -79,7 +74,7 @@ export class AlterStatementParser extends Parser {
             let [pk, not_null, unique]: [boolean, boolean, boolean] = [false, false, false];
             let default_value: string | number | boolean | undefined;
             let reference: string | undefined;
-            let column: AlterTableAddColumnStatement = {
+            let column: AlterTableColumnStatement = {
                 type: "AlterTableAddColumnStatement",
                 name: table_name.value,
                 column_name: col_name.value,
@@ -129,7 +124,7 @@ export class AlterStatementParser extends Parser {
             return column;
         }
     
-        function parse_alter_table_drop_column(table_name: Token) : AlterTableDropColumnStatement {
+        function parse_alter_table_drop_column(table_name: Token) : AlterTableColumnStatement {
             if (typeof(table_name.value) !== "string")
                 throw new Error(`syntax error: unexpected token '${table_name.value}', expected identifer`);
             this.consume(TokenType.KEYWORD, 'DROP');
@@ -186,7 +181,7 @@ export class AlterStatementParser extends Parser {
     
             function parse_alter_table_alter_column_datatype(
                 table_name: Token, col_name: Token
-            ) : AlterTableAlterColumnDataTypeStatement {
+            ) : AlterTableColumnStatement {
                 if (typeof(table_name.value) !== "string") 
                     throw new Error(`syntax error: unexpected ${table_name.value}, expected identifier`);
                 if (typeof(col_name.value) !== "string") 
@@ -205,31 +200,33 @@ export class AlterStatementParser extends Parser {
 
             function parse_alter_table_alter_column_default_value(
                 table_name: Token, col_name: Token, set_or_drop: boolean = false
-            ) : AlterTableAlterColumnDefaultValueStatement {
+            ) : AlterTableColumnStatement {
                 if (typeof(table_name.value) !== "string") 
                     throw new Error(`syntax error: unexpected ${table_name.value}, expected identifier`);
                 if (typeof(col_name.value) !== "string") 
                     throw new Error(`syntax error: unexpected ${col_name.value}, expected identifier`);
                 this.consume(TokenType.KEYWORD, 'DEFAULT');
-                let statement: AlterTableAlterColumnDefaultValueStatement = {
+                let statement: AlterTableColumnStatement = {
                     type: "AlterTableAlterColumnDefaultValueStatement",
                     name: table_name.value,
                     column_name: col_name.value,
-                    set_or_drop: set_or_drop
+                    constraints: {
+                        default: null
+                    }
                 }
                 let default_value: Token;
                 if (set_or_drop) {
                     default_value = this.consume(TokenType.IDENTIFIER)
                     if (typeof(default_value.value) !== "string") 
                         throw new Error(`syntax error: unexpected ${default_value.value}, expected identifier`);
-                    statement.default_value = default_value.value
+                    statement.constraints!.default = default_value.value
                 }
                 return statement;
             }
 
             function parse_alter_table_alter_column_not_null(
                 table_name: Token, col_name:Token, set_or_drop: boolean = false
-            ) : AlterTableAlterColumnNotNullStatement {
+            ) : AlterTableColumnStatement {
                 if (typeof(table_name.value) !== "string") 
                     throw new Error(`syntax error: unexpected ${table_name.value}, expected identifier`);
                 if (typeof(col_name.value) !== "string") 
@@ -240,12 +237,14 @@ export class AlterStatementParser extends Parser {
                     type: "AlterTableAlterColumnNotNullStatement",
                     name: table_name.value,
                     column_name: col_name.value,
-                    set_or_drop: set_or_drop
+                    constraints: {
+                        not_null: set_or_drop
+                    }
                 };
             }
         }
 
-        function parse_rename_table(table_name: Token) : AlterTableRenameColumnStatement {
+        function parse_rename_table(table_name: Token) : AlterTableColumnStatement {
             if (typeof(table_name.value) !== "string")
                 throw new Error(`syntax error: unexpected token '${table_name.value}', expected identifer`);
             this.consume(TokenType.KEYWORD, 'RENAME');
@@ -259,8 +258,8 @@ export class AlterStatementParser extends Parser {
             return {
                 type: "AlterTableRenameColumnStatement",
                 name: table_name.value,
-                column_old_name: old_name.value,
-                column_new_name: new_name.value
+                column_name: old_name.value,
+                new_name: new_name.value
             }
         }
     }
