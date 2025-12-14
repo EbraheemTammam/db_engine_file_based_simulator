@@ -23,10 +23,10 @@ export class DropStatementParser extends Parser {
                 statement = this.parse_drop_index();
                 break;
             default:
-                throw new Error(`syntax error: expected identifier, got '${next.value}'`);
+                throw new SyntaxError(`expected identifier, got '${next.value}'`);
         }
         if (this._cursor < this._length && this._lexemes[this._cursor].type !== TokenType.EOF)
-            throw new Error(`syntax error: unexpected token ${this.peek().value}, expected ; or EOF`);
+            throw new SyntaxError(`unexpected token ${this.peek().value}, expected ; or EOF`);
         return statement;
     }
 
@@ -35,7 +35,7 @@ export class DropStatementParser extends Parser {
         let dbs: Token[] = new Array<Token>();
         dbs.push(this.consume(TokenType.IDENTIFIER));
         if (typeof(dbs[0].value) !== "string") 
-            throw new Error(`syntax error: expected identifier, got '${dbs[0].value}'`);
+            throw new SyntaxError(`expected identifier, got '${dbs[0].value}'`);
         while (![TokenType.EOF, TokenType.SEMICOLON].includes(this.peek().type)) {
             this.consume(TokenType.COMMA);
             dbs.push(this.consume(TokenType.IDENTIFIER));
@@ -44,7 +44,7 @@ export class DropStatementParser extends Parser {
             type: "DropDatabaseStatement",
             objects: dbs.map(t => {
                 if (typeof(t.value) !== "string") 
-                    throw new Error(`syntax error: expected identifier, got '${t.value}'`);
+                    throw new SyntaxError(`expected identifier, got '${t.value}'`);
                 return t.value;
             })
         }
@@ -55,7 +55,7 @@ export class DropStatementParser extends Parser {
         let tables: Token[] = new Array<Token>();
         tables.push(this.consume(TokenType.IDENTIFIER));
         if (typeof(tables[0].value) !== "string") 
-            throw new Error(`syntax error: expected identifier, got '${tables[0].value}'`);
+            throw new SyntaxError(`expected identifier, got '${tables[0].value}'`);
         while (![TokenType.EOF, TokenType.SEMICOLON].includes(this.peek().type)) {
             this.consume(TokenType.COMMA);
             tables.push(this.consume(TokenType.IDENTIFIER));
@@ -64,7 +64,7 @@ export class DropStatementParser extends Parser {
             type: "DropTableStatement",
             objects: tables.map(t => {
                 if (typeof(t.value) !== "string") 
-                    throw new Error(`syntax error: expected identifier, got '${t.value}'`);
+                    throw new SyntaxError(`expected identifier, got '${t.value}'`);
                 return t.value;
             })
         }
@@ -75,7 +75,7 @@ export class DropStatementParser extends Parser {
         let indexes: Token[] = new Array<Token>();
         indexes.push(this.consume(TokenType.IDENTIFIER));
         if (typeof(indexes[0].value) !== "string") 
-            throw new Error(`syntax error: expected identifier, got '${indexes[0].value}'`);
+            throw new SyntaxError(`expected identifier, got '${indexes[0].value}'`);
         while (![TokenType.EOF, TokenType.SEMICOLON].includes(this.peek().type)) {
             this.consume(TokenType.COMMA);
             indexes.push(this.consume(TokenType.IDENTIFIER));
@@ -84,7 +84,7 @@ export class DropStatementParser extends Parser {
             type: "DropIndexStatement",
             objects: indexes.map(t => {
                 if (typeof(t.value) !== "string") 
-                    throw new Error(`syntax error: expected identifier, got '${t.value}'`);
+                    throw new SyntaxError(`expected identifier, got '${t.value}'`);
                 return t.value;
             })
         }

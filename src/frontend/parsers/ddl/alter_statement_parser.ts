@@ -22,10 +22,10 @@ export class AlterStatementParser extends Parser {
                 statement = this.parse_rename_index();
                 break;
             default:
-                throw new Error(`syntax error: expected identifier, got '${next.value}'`);
+                throw new SyntaxError(`expected identifier, got '${next.value}'`);
         }
         if (this._cursor < this._length && this._lexemes[this._cursor].type !== TokenType.EOF)
-            throw new Error(`syntax error: unexpected token ${this.peek().value}, expected ; or EOF`);
+            throw new SyntaxError(`unexpected token ${this.peek().value}, expected ; or EOF`);
         return statement;
     }
     
@@ -33,12 +33,12 @@ export class AlterStatementParser extends Parser {
         this.consume(TokenType.KEYWORD, 'DATABASE');
         let db_name = this.consume(TokenType.IDENTIFIER);
         if (typeof(db_name.value) !== "string")
-            throw new Error(`syntax error: unexpected token '${db_name.value}', expected identifer`);
+            throw new SyntaxError(`unexpected token '${db_name.value}', expected identifer`);
         this.consume(TokenType.KEYWORD, 'RENAME');
         this.consume(TokenType.KEYWORD, 'TO');
         let new_name = this.consume(TokenType.IDENTIFIER);
         if (typeof(new_name.value) !== "string")
-            throw new Error(`syntax error: unexpected token '${new_name.value}', expected identifer`);
+            throw new SyntaxError(`unexpected token '${new_name.value}', expected identifer`);
         return {
             type: "RenameDatabaseStatement",
             name: db_name.value,
@@ -50,12 +50,12 @@ export class AlterStatementParser extends Parser {
         this.consume(TokenType.KEYWORD, 'INDEX');
         let idx_name = this.consume(TokenType.IDENTIFIER);
         if (typeof(idx_name.value) !== "string")
-            throw new Error(`syntax error: unexpected token '${idx_name.value}', expected identifer`);
+            throw new SyntaxError(`unexpected token '${idx_name.value}', expected identifer`);
         this.consume(TokenType.KEYWORD, 'RENAME');
         this.consume(TokenType.KEYWORD, 'TO');
         let new_name = this.consume(TokenType.IDENTIFIER);
         if (typeof(new_name.value) !== "string")
-            throw new Error(`syntax error: unexpected token '${new_name.value}', expected identifer`);
+            throw new SyntaxError(`unexpected token '${new_name.value}', expected identifer`);
         return {
             type: "RenameIndexStatement",
             name: idx_name.value,

@@ -8,7 +8,7 @@ export class AlterTableParser extends Parser {
         this.consume(TokenType.KEYWORD, 'TABLE');
         let table_name: Token = this.consume(TokenType.IDENTIFIER);
         if (typeof(table_name.value) !== "string")
-            throw new Error(`syntax error: unexpected token '${table_name.value}', expected identifer`);
+            throw new SyntaxError(`unexpected token '${table_name.value}', expected identifer`);
         let next: Token = this.peek();
         switch (next.value) {
             case 'ADD':
@@ -20,22 +20,22 @@ export class AlterTableParser extends Parser {
             case 'RENAME':
                 return this.parse_rename_table(table_name);
             default:
-                throw new Error(`syntax error: unexpected token '${next.value}', expected KEYWORD`);
+                throw new SyntaxError(`unexpected token '${next.value}', expected KEYWORD`);
         }
     }
                     
     private parse_alter_table_add_column(table_name: Token) : AlterTableColumnStatement {
         if (typeof(table_name.value) !== "string") {
-            throw new Error(`syntax error: unexpected token '${table_name.value}', expected identifer`);
+            throw new SyntaxError(`unexpected token '${table_name.value}', expected identifer`);
         }
         this.consume(TokenType.KEYWORD, 'ADD');
         this.consume(TokenType.KEYWORD, 'COLUMN');
         let col_name: Token = this.consume(TokenType.IDENTIFIER);
         if (typeof(col_name.value) !== "string") 
-            throw new Error(`syntax error: unexpected token ${col_name.value}, expected identifier`);
+            throw new SyntaxError(`unexpected token ${col_name.value}, expected identifier`);
         let ctype: Token = this.consume(TokenType.TYPE);
         if (typeof(ctype.value) !== "string") 
-            throw new Error(`syntax error: unexpected token ${ctype.value}, expected identifier`);
+            throw new SyntaxError(`unexpected token ${ctype.value}, expected identifier`);
         let [pk, not_null, unique]: [boolean, boolean, boolean] = [false, false, false];
         let default_value: string | number | boolean | undefined;
         let reference: string | undefined;
@@ -75,7 +75,7 @@ export class AlterTableParser extends Parser {
                         this.consume(TokenType.CLOSE_PARAN).value
                     ].join('');
                 default:
-                    throw new Error(`syntax error: unexpected token '${next.value}'`);
+                    throw new SyntaxError(`unexpected token '${next.value}'`);
             }
         }
         next = this.consume();
@@ -91,12 +91,12 @@ export class AlterTableParser extends Parser {
     
     private parse_alter_table_drop_column(table_name: Token) : AlterTableColumnStatement {
         if (typeof(table_name.value) !== "string")
-            throw new Error(`syntax error: unexpected token '${table_name.value}', expected identifer`);
+            throw new SyntaxError(`syntax SyntaxError: unexpected token '${table_name.value}', expected identifer`);
         this.consume(TokenType.KEYWORD, 'DROP');
         this.consume(TokenType.KEYWORD, 'COLUMN');
         let column_name: Token = this.consume(TokenType.IDENTIFIER);
         if (typeof(column_name.value) !== "string") 
-            throw new Error(`syntax error: unexpected token ${column_name.value}, expected identifier`);
+            throw new SyntaxError(`syntax SyntaxError: unexpected token ${column_name.value}, expected identifier`);
         return {
             type: "AlterTableDropColumnStatement",
             name: table_name.value,
@@ -124,7 +124,7 @@ export class AlterTableParser extends Parser {
                         statement = parse_alter_table_alter_column_not_null(this, table_name, col_name, true);
                         break;
                     default:
-                        throw new Error(`syntax error: unexpected token '${next.value}', expected KEYWORD`);
+                        throw new SyntaxError(`syntax SyntaxError: unexpected token '${next.value}', expected KEYWORD`);
                 }
                 break;
             case 'DROP':
@@ -136,27 +136,27 @@ export class AlterTableParser extends Parser {
                         statement = parse_alter_table_alter_column_not_null(this, table_name, col_name);
                         break;
                     default:
-                        throw new Error(`syntax error: unexpected token '${next.value}', expected KEYWORD`);
+                        throw new SyntaxError(`syntax SyntaxError: unexpected token '${next.value}', expected KEYWORD`);
                 }
                 break;
             default:
-                throw new Error(`syntax error: unexpected token '${behavior.value}', expected KEYWORD`);
+                throw new SyntaxError(`syntax SyntaxError: unexpected token '${behavior.value}', expected KEYWORD`);
         }
         if (this._cursor < this._length && this._lexemes[this._cursor].type !== TokenType.EOF)
-            throw new Error(`syntax error: unexpected token ${this.peek().value}, expected ; or EOF`);
+            throw new SyntaxError(`syntax SyntaxError: unexpected token ${this.peek().value}, expected ; or EOF`);
         return statement;
 
         function parse_alter_table_alter_column_datatype(
             self: AlterTableParser, table_name: Token, col_name: Token
         ) : AlterTableColumnStatement {
             if (typeof(table_name.value) !== "string") 
-                throw new Error(`syntax error: unexpected ${table_name.value}, expected identifier`);
+                throw new SyntaxError(`syntax SyntaxError: unexpected ${table_name.value}, expected identifier`);
             if (typeof(col_name.value) !== "string") 
-                throw new Error(`syntax error: unexpected ${col_name.value}, expected identifier`);
+                throw new SyntaxError(`syntax SyntaxError: unexpected ${col_name.value}, expected identifier`);
             self.consume(TokenType.KEYWORD, 'DATATYPE');
             let datatype: Token = self.consume(TokenType.IDENTIFIER);
             if (typeof(datatype.value) !== "string") 
-                throw new Error(`syntax error: unexpected ${datatype.value}, expected identifier`);
+                throw new SyntaxError(`syntax SyntaxError: unexpected ${datatype.value}, expected identifier`);
             return {
                 type: "AlterTableAlterColumnDataTypeStatement",
                 name: table_name.value,
@@ -169,9 +169,9 @@ export class AlterTableParser extends Parser {
             self: AlterTableParser, table_name: Token, col_name: Token, set_or_drop: boolean = false
         ) : AlterTableColumnStatement {
             if (typeof(table_name.value) !== "string") 
-                throw new Error(`syntax error: unexpected ${table_name.value}, expected identifier`);
+                throw new SyntaxError(`syntax SyntaxError: unexpected ${table_name.value}, expected identifier`);
             if (typeof(col_name.value) !== "string") 
-                throw new Error(`syntax error: unexpected ${col_name.value}, expected identifier`);
+                throw new SyntaxError(`syntax SyntaxError: unexpected ${col_name.value}, expected identifier`);
             self.consume(TokenType.KEYWORD, 'DEFAULT');
             let statement: AlterTableColumnStatement = {
                 type: "AlterTableAlterColumnDefaultValueStatement",
@@ -185,7 +185,7 @@ export class AlterTableParser extends Parser {
             if (set_or_drop) {
                 default_value = self.consume(TokenType.IDENTIFIER)
                 if (typeof(default_value.value) !== "string") 
-                    throw new Error(`syntax error: unexpected ${default_value.value}, expected identifier`);
+                    throw new SyntaxError(`syntax SyntaxError: unexpected ${default_value.value}, expected identifier`);
                 statement.constraints!.default = default_value.value
             }
             return statement;
@@ -195,9 +195,9 @@ export class AlterTableParser extends Parser {
             self: AlterTableParser, table_name: Token, col_name:Token, set_or_drop: boolean = false
         ) : AlterTableColumnStatement {
             if (typeof(table_name.value) !== "string") 
-                throw new Error(`syntax error: unexpected ${table_name.value}, expected identifier`);
+                throw new SyntaxError(`syntax SyntaxError: unexpected ${table_name.value}, expected identifier`);
             if (typeof(col_name.value) !== "string") 
-                throw new Error(`syntax error: unexpected ${col_name.value}, expected identifier`);
+                throw new SyntaxError(`syntax SyntaxError: unexpected ${col_name.value}, expected identifier`);
             self.consume(TokenType.KEYWORD, 'NOT');
             self.consume(TokenType.NULL);
             return {
@@ -213,15 +213,15 @@ export class AlterTableParser extends Parser {
 
     private parse_rename_table(table_name: Token) : AlterTableColumnStatement {
         if (typeof(table_name.value) !== "string")
-            throw new Error(`syntax error: unexpected token '${table_name.value}', expected identifer`);
+            throw new SyntaxError(`syntax SyntaxError: unexpected token '${table_name.value}', expected identifer`);
         this.consume(TokenType.KEYWORD, 'RENAME');
         this.consume(TokenType.KEYWORD, 'COLUMN');
         let old_name: Token = this.consume(TokenType.IDENTIFIER);
         if (typeof(old_name.value) !== "string")
-            throw new Error(`syntax error: unexpected token '${old_name.value}', expected identifer`);
+            throw new SyntaxError(`syntax SyntaxError: unexpected token '${old_name.value}', expected identifer`);
         let new_name: Token = this.consume(TokenType.IDENTIFIER);
         if (typeof(new_name.value) !== "string")
-            throw new Error(`syntax error: unexpected token '${new_name.value}', expected identifer`);
+            throw new SyntaxError(`syntax SyntaxError: unexpected token '${new_name.value}', expected identifer`);
         return {
             type: "AlterTableRenameColumnStatement",
             name: table_name.value,
