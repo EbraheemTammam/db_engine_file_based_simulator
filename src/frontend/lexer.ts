@@ -161,7 +161,7 @@ export class Lexer {
                     continue;
             }
 
-            throw Error(`syntax error: unknown character '${char}' at char:${this._cursor + 1}`);
+            throw SyntaxError(`unknown character '${char}' at char:${this._cursor + 1}`);
         }
 
        return this._tokens;
@@ -179,7 +179,7 @@ export class Lexer {
         while (this._buffer[iterator + 1] !== quote) {
             ++iterator;
             if (iterator === this._buffer_size) // reaching end of input without closing quote
-                throw new Error(`syntax error: quote at char:${this._cursor + 1} had never closed`)
+                throw new SyntaxError(`quote at char:${this._cursor + 1} had never closed`)
         };
         this._tokens.push(
             {
@@ -202,7 +202,7 @@ export class Lexer {
         if (this._buffer[iterator + 1] === '.') { // handling floating point
             ++iterator;
             if (!Lexer.is_number(this._buffer[iterator + 1]))
-                throw new Error(`syntax error: unexpected '${this._buffer[iterator]}' at char:${iterator + 1}`)
+                throw new SyntaxError(`unexpected '${this._buffer[iterator]}' at char:${iterator + 1}`)
             while (
                 iterator !== this._buffer_size &&
                 Lexer.is_number(this._buffer[iterator + 1])
