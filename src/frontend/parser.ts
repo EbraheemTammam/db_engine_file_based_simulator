@@ -32,6 +32,6 @@ export abstract class Parser implements IParser {
     }
 
     protected is_eof() : boolean {
-        return this._cursor === this._length;
+        return this._cursor === this._length || this.peek().type == TokenType.EOF;
     }
 }
