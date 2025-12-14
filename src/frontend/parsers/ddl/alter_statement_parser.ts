@@ -24,7 +24,7 @@ export class AlterStatementParser extends Parser {
             default:
                 throw new Error(`syntax error: expected identifier, got '${next.value}'`);
         }
-        if (this._cursor < this._length)
+        if (this._cursor < this._length && this._lexemes[this._cursor].type !== TokenType.EOF)
             throw new Error(`syntax error: unexpected token ${this.peek().value}, expected ; or EOF`);
         return statement;
     }
