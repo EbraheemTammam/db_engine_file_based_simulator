@@ -4,6 +4,7 @@ import { Token, TokenType } from "src/interfaces/token";
 
 export class AlterTableParser extends Parser {
     parse() : AlterStatement {
+        this.consume(TokenType.KEYWORD, 'ALTER');
         this.consume(TokenType.KEYWORD, 'TABLE');
         let table_name: Token = this.consume(TokenType.IDENTIFIER);
         if (typeof(table_name.value) !== "string")
@@ -109,42 +110,30 @@ export class AlterTableParser extends Parser {
         let col_name: Token = this.consume(TokenType.IDENTIFIER);
         let behavior: Token = this.consume(TokenType.KEYWORD);
         let next: Token = this.peek();
-        let statement: AlterStatement;
         switch (behavior.value) {
             case 'SET':
                 switch (next.value) {
                     case 'DATATYPE':
-                        statement = parse_alter_table_alter_column_datatype(this, table_name, col_name);
-                        break;
+                        return parse_alter_table_alter_column_datatype(this, table_name, col_name);
                     case 'DEFAULT':
-                        statement = parse_alter_table_alter_column_default_value(this, table_name, col_name, true);
-                        break;
+                        return parse_alter_table_alter_column_default_value(this, table_name, col_name, true);
                     case 'NOT':
-                        statement = parse_alter_table_alter_column_not_null(this, table_name, col_name, true);
-                        break;
+                        return parse_alter_table_alter_column_not_null(this, table_name, col_name, true);
                     default:
                         throw new Error(`syntax error: unexpected token '${next.value}', expected KEYWORD`);
                 }
-                break;
             case 'DROP':
                 switch (next.value) {
                     case 'DEFAULT':
-                        statement = parse_alter_table_alter_column_default_value(this, table_name, col_name);
-                        break;
+                        return parse_alter_table_alter_column_default_value(this, table_name, col_name);
                     case 'NOT':
-                        statement = parse_alter_table_alter_column_not_null(this, table_name, col_name);
-                        break;
+                        return parse_alter_table_alter_column_not_null(this, table_name, col_name);
                     default:
                         throw new Error(`syntax error: unexpected token '${next.value}', expected KEYWORD`);
                 }
-                break;
             default:
                 throw new Error(`syntax error: unexpected token '${behavior.value}', expected KEYWORD`);
         }
-        next = this.peek();
-        if ([TokenType.SEMICOLON, TokenType.EOF].includes(next.type))
-            throw new Error(`syntax error: unexpected token ${next.value}, expected ; or EOF`);
-        return statement;
 
         function parse_alter_table_alter_column_datatype(
             self: AlterTableParser, table_name: Token, col_name: Token
@@ -199,7 +188,7 @@ export class AlterTableParser extends Parser {
             if (typeof(col_name.value) !== "string") 
                 throw new Error(`syntax error: unexpected ${col_name.value}, expected identifier`);
             self.consume(TokenType.KEYWORD, 'NOT');
-            self.consume(TokenType.KEYWORD, 'NULL');
+            self.consume(TokenType.NULL);
             return {
                 type: "AlterTableAlterColumnNotNullStatement",
                 name: table_name.value,
