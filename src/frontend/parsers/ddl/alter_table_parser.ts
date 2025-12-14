@@ -110,18 +110,17 @@ export class AlterTableParser extends Parser {
         let behavior: Token = this.consume(TokenType.KEYWORD);
         let next: Token = this.peek();
         let statement: AlterStatement;
-        let self: AlterTableParser = this;
         switch (behavior.value) {
             case 'SET':
                 switch (next.value) {
                     case 'DATATYPE':
-                        statement = parse_alter_table_alter_column_datatype(self, table_name, col_name);
+                        statement = parse_alter_table_alter_column_datatype(this, table_name, col_name);
                         break;
                     case 'DEFAULT':
-                        statement = parse_alter_table_alter_column_default_value(self, table_name, col_name, true);
+                        statement = parse_alter_table_alter_column_default_value(this, table_name, col_name, true);
                         break;
                     case 'NOT':
-                        statement = parse_alter_table_alter_column_not_null(self, table_name, col_name, true);
+                        statement = parse_alter_table_alter_column_not_null(this, table_name, col_name, true);
                         break;
                     default:
                         throw new Error(`syntax error: unexpected token '${next.value}', expected KEYWORD`);
@@ -130,10 +129,10 @@ export class AlterTableParser extends Parser {
             case 'DROP':
                 switch (next.value) {
                     case 'DEFAULT':
-                        statement = parse_alter_table_alter_column_default_value(self, table_name, col_name);
+                        statement = parse_alter_table_alter_column_default_value(this, table_name, col_name);
                         break;
                     case 'NOT':
-                        statement = parse_alter_table_alter_column_not_null(self, table_name, col_name);
+                        statement = parse_alter_table_alter_column_not_null(this, table_name, col_name);
                         break;
                     default:
                         throw new Error(`syntax error: unexpected token '${next.value}', expected KEYWORD`);
