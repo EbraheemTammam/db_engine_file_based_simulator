@@ -12,16 +12,23 @@ export class CreateStatementParser extends Parser {
     public parse() : CreateStatement {
         this.consume(TokenType.KEYWORD, 'CREATE');
         let next: Token = this.peek();
+        let statement: CreateStatement;
         switch (next.value) {
             case "DATABASE":
-                return this.parse_create_database();
+                statement = this.parse_create_database();
+                break;
             case "TABLE":
-                return this.parse_create_table();
+                statement = this.parse_create_table();
+                break;
             case "INDEX":
-                return this.parse_create_index();
+                statement = this.parse_create_index();
+                break;
             default:
                 throw new Error(`syntax error: expected identifier, got ${next.value}`);
         }
+        if (this._cursor < this._length)
+            throw new Error(`syntax error: unexpected token ${this.peek().value}, expected ; or EOF`);
+        return statement;
     }
 
     private parse_create_database() : CreateDatabaseStatement {

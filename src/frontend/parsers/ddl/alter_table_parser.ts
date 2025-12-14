@@ -110,30 +110,41 @@ export class AlterTableParser extends Parser {
         let col_name: Token = this.consume(TokenType.IDENTIFIER);
         let behavior: Token = this.consume(TokenType.KEYWORD);
         let next: Token = this.peek();
+        let statement: AlterStatement;
         switch (behavior.value) {
             case 'SET':
                 switch (next.value) {
                     case 'DATATYPE':
-                        return parse_alter_table_alter_column_datatype(this, table_name, col_name);
+                        statement = parse_alter_table_alter_column_datatype(this, table_name, col_name);
+                        break;
                     case 'DEFAULT':
-                        return parse_alter_table_alter_column_default_value(this, table_name, col_name, true);
+                        statement = parse_alter_table_alter_column_default_value(this, table_name, col_name, true);
+                        break;
                     case 'NOT':
-                        return parse_alter_table_alter_column_not_null(this, table_name, col_name, true);
+                        statement = parse_alter_table_alter_column_not_null(this, table_name, col_name, true);
+                        break;
                     default:
                         throw new Error(`syntax error: unexpected token '${next.value}', expected KEYWORD`);
                 }
+                break;
             case 'DROP':
                 switch (next.value) {
                     case 'DEFAULT':
-                        return parse_alter_table_alter_column_default_value(this, table_name, col_name);
+                        statement = parse_alter_table_alter_column_default_value(this, table_name, col_name);
+                        break;
                     case 'NOT':
-                        return parse_alter_table_alter_column_not_null(this, table_name, col_name);
+                        statement = parse_alter_table_alter_column_not_null(this, table_name, col_name);
+                        break;
                     default:
                         throw new Error(`syntax error: unexpected token '${next.value}', expected KEYWORD`);
                 }
+                break;
             default:
                 throw new Error(`syntax error: unexpected token '${behavior.value}', expected KEYWORD`);
         }
+        if (this._cursor < this._length)
+            throw new Error(`syntax error: unexpected token ${this.peek().value}, expected ; or EOF`);
+        return statement;
 
         function parse_alter_table_alter_column_datatype(
             self: AlterTableParser, table_name: Token, col_name: Token

@@ -14,6 +14,8 @@ export class TruncateStatementParser extends Parser {
             this.consume(TokenType.COMMA);
             tables.push(this.consume(TokenType.IDENTIFIER));
         }
+        if (this._cursor < this._length)
+            throw new Error(`syntax error: unexpected token ${this.peek().value}, expected ; or EOF`);
         return {
             type: "TruncateTableStatement",
             tables: tables.map(t => {

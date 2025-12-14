@@ -11,16 +11,23 @@ export class DropStatementParser extends Parser {
     public parse() : DropStatement {
         this.consume(TokenType.KEYWORD, 'DROP');
         let next: Token = this.peek();
+        let statement: DropStatement;
         switch (next.value) {
             case "DATABASE":
-                return this.parse_drop_database();
+                statement = this.parse_drop_database();
+                break;
             case "TABLE":
-                return this.parse_drop_table();
+                statement = this.parse_drop_table();
+                break;
             case "INDEX":
-                return this.parse_drop_index();
+                statement = this.parse_drop_index();
+                break;
             default:
                 throw new Error(`syntax error: expected identifier, got '${next.value}'`);
         }
+        if (this._cursor < this._length)
+            throw new Error(`syntax error: unexpected token ${this.peek().value}, expected ; or EOF`);
+        return statement;
     }
 
     private parse_drop_database() : DropDatabaseStatement {

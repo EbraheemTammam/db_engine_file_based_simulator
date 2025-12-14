@@ -11,16 +11,22 @@ export class AlterStatementParser extends Parser {
     public parse() : AlterStatement {
         this.consume(TokenType.KEYWORD, 'ALTER');
         let next: Token = this.peek();
+        let statement: AlterStatement;
         switch (next.value) {
             case "DATABASE":
-                return this.parse_rename_database();
+                statement = this.parse_rename_database();
+                break;
             case "TABLE":
                 return (new AlterTableParser(this._lexemes)).parse();
             case "INDEX":
-                return this.parse_rename_index();
+                statement = this.parse_rename_index();
+                break;
             default:
                 throw new Error(`syntax error: expected identifier, got '${next.value}'`);
         }
+        if (this._cursor < this._length)
+            throw new Error(`syntax error: unexpected token ${this.peek().value}, expected ; or EOF`);
+        return statement;
     }
     
     private parse_rename_database() : RenameDatabaseStatement {
