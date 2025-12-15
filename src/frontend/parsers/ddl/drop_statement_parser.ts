@@ -1,11 +1,6 @@
 import { Parser } from "src/frontend/parser";
 import { Token, TokenType } from "src/interfaces/token";
-import { 
-    DropDatabaseStatement, 
-    DropIndexStatement, 
-    DropStatement, 
-    DropTableStatement 
-} from "src/interfaces/ddl/drop_statement_ast";
+import { DropStatement } from "src/interfaces/ddl/drop_statement_ast";
 
 export class DropStatementParser extends Parser {
     public parse() : DropStatement {
@@ -30,7 +25,7 @@ export class DropStatementParser extends Parser {
         return statement;
     }
 
-    private parse_drop_database() : DropDatabaseStatement {
+    private parse_drop_database() : DropStatement {
         this.consume(TokenType.KEYWORD, 'DATABASE');
         let dbs: Token[] = new Array<Token>();
         dbs.push(this.consume(TokenType.IDENTIFIER));
@@ -50,7 +45,7 @@ export class DropStatementParser extends Parser {
         }
     }
 
-    private parse_drop_table() : DropTableStatement {
+    private parse_drop_table() : DropStatement {
         this.consume(TokenType.KEYWORD, 'TABLE');
         let tables: Token[] = new Array<Token>();
         tables.push(this.consume(TokenType.IDENTIFIER));
@@ -70,7 +65,7 @@ export class DropStatementParser extends Parser {
         }
     }
 
-    private parse_drop_index() : DropIndexStatement {
+    private parse_drop_index() : DropStatement {
         this.consume(TokenType.KEYWORD, 'INDEX');
         let indexes: Token[] = new Array<Token>();
         indexes.push(this.consume(TokenType.IDENTIFIER));
