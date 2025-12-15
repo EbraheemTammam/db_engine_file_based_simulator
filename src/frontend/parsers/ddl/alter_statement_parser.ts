@@ -39,7 +39,7 @@ export class AlterStatementParser extends Parser {
         if (typeof(new_name.value) !== "string")
             throw new SyntaxError(`unexpected token '${new_name.value}', expected identifer`);
         return {
-            type: "RenameDatabase",
+            type: "AlterDatabaseName",
             name: db_name.value,
             new_name: new_name.value
         }
@@ -56,7 +56,7 @@ export class AlterStatementParser extends Parser {
         if (typeof(new_name.value) !== "string")
             throw new SyntaxError(`unexpected token '${new_name.value}', expected identifer`);
         return {
-            type: "RenameIndex",
+            type: "AlterIndexName",
             name: idx_name.value,
             new_name: new_name.value
         }

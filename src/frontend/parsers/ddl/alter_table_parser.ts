@@ -1,5 +1,5 @@
 import { Parser } from "src/frontend/parser";
-import { AlterStatement, AlterTableColumnStatement, RenameStatement } from "src/interfaces/ddl/alter_statement_ast";
+import { AlterStatement, AlterColumnStatement, RenameStatement } from "src/interfaces/ddl/alter_statement_ast";
 import { Token, TokenType } from "src/interfaces/token";
 
 export class AlterTableParser extends Parser {
@@ -27,7 +27,7 @@ export class AlterTableParser extends Parser {
         }
     }
                     
-    private parse_add_column(table_name: Token) : AlterTableColumnStatement {
+    private parse_add_column(table_name: Token) : AlterColumnStatement {
         if (typeof(table_name.value) !== "string") {
             throw new SyntaxError(`unexpected token '${table_name.value}', expected identifer`);
         }
@@ -42,8 +42,8 @@ export class AlterTableParser extends Parser {
         let [pk, not_null, unique]: [boolean, boolean, boolean] = [false, false, false];
         let default_value: string | number | boolean | undefined;
         let reference: string | undefined;
-        let column: AlterTableColumnStatement = {
-            type: "AlterTableAddColumn",
+        let column: AlterColumnStatement = {
+            type: "AlterColumnAdd",
             name: table_name.value,
             column_name: col_name.value,
             data_type: ctype.value, 
@@ -92,7 +92,7 @@ export class AlterTableParser extends Parser {
         return column;
     }
     
-    private parse_drop_column(table_name: Token) : AlterTableColumnStatement {
+    private parse_drop_column(table_name: Token) : AlterColumnStatement {
         if (typeof(table_name.value) !== "string")
             throw new SyntaxError(`unexpected token '${table_name.value}', expected identifer`);
         this.consume(TokenType.KEYWORD, 'DROP');
@@ -101,7 +101,7 @@ export class AlterTableParser extends Parser {
         if (typeof(column_name.value) !== "string") 
             throw new SyntaxError(`unexpected token ${column_name.value}, expected identifier`);
         return {
-            type: "AlterTableDropColumn",
+            type: "AlterColumnDrop",
             name: table_name.value,
             column_name: column_name.value
         }
@@ -151,7 +151,7 @@ export class AlterTableParser extends Parser {
 
         function parse_alter_column_datatype(
             self: AlterTableParser, table_name: Token, col_name: Token
-        ) : AlterTableColumnStatement {
+        ) : AlterColumnStatement {
             if (typeof(table_name.value) !== "string") 
                 throw new SyntaxError(`unexpected ${table_name.value}, expected identifier`);
             if (typeof(col_name.value) !== "string") 
@@ -161,7 +161,7 @@ export class AlterTableParser extends Parser {
             if (typeof(datatype.value) !== "string") 
                 throw new SyntaxError(`unexpected ${datatype.value}, expected identifier`);
             return {
-                type: "AlterTableAlterColumnDataType",
+                type: "AlterColumnDataType",
                 name: table_name.value,
                 column_name: col_name.value,
                 data_type: datatype.value
@@ -170,14 +170,14 @@ export class AlterTableParser extends Parser {
 
         function parse_alter_column_default_value(
             self: AlterTableParser, table_name: Token, col_name: Token, set_or_drop: boolean = false
-        ) : AlterTableColumnStatement {
+        ) : AlterColumnStatement {
             if (typeof(table_name.value) !== "string") 
                 throw new SyntaxError(`unexpected ${table_name.value}, expected identifier`);
             if (typeof(col_name.value) !== "string") 
                 throw new SyntaxError(`unexpected ${col_name.value}, expected identifier`);
             self.consume(TokenType.KEYWORD, 'DEFAULT');
-            let statement: AlterTableColumnStatement = {
-                type: "AlterTableAlterColumnDefaultValue",
+            let statement: AlterColumnStatement = {
+                type: "AlterColumnDefaultValue",
                 name: table_name.value,
                 column_name: col_name.value,
                 constraints: {
@@ -196,7 +196,7 @@ export class AlterTableParser extends Parser {
 
         function parse_alter_column_not_null(
             self: AlterTableParser, table_name: Token, col_name:Token, set_or_drop: boolean = false
-        ) : AlterTableColumnStatement {
+        ) : AlterColumnStatement {
             if (typeof(table_name.value) !== "string") 
                 throw new SyntaxError(`unexpected ${table_name.value}, expected identifier`);
             if (typeof(col_name.value) !== "string") 
@@ -204,7 +204,7 @@ export class AlterTableParser extends Parser {
             self.consume(TokenType.KEYWORD, 'NOT');
             self.consume(TokenType.NULL);
             return {
-                type: "AlterTableAlterColumnNotNull",
+                type: "AlterColumnNotNull",
                 name: table_name.value,
                 column_name: col_name.value,
                 constraints: {
@@ -214,7 +214,7 @@ export class AlterTableParser extends Parser {
         }
     }
 
-    private parse_rename_column(table_name: Token) : AlterTableColumnStatement {
+    private parse_rename_column(table_name: Token) : AlterColumnStatement {
         if (typeof(table_name.value) !== "string")
             throw new SyntaxError(`unexpected token '${table_name.value}', expected identifer`);
         this.consume(TokenType.KEYWORD, 'COLUMN');
@@ -226,7 +226,7 @@ export class AlterTableParser extends Parser {
         if (typeof(new_name.value) !== "string")
             throw new SyntaxError(`unexpected token '${new_name.value}', expected identifer`);
         return {
-            type: "AlterTableRenameColumn",
+            type: "AlterColumnName",
             name: table_name.value,
             column_name: old_name.value,
             new_name: new_name.value
@@ -241,7 +241,7 @@ export class AlterTableParser extends Parser {
         if (typeof(new_name.value) !== "string")
             throw new SyntaxError(`unexpected token '${new_name.value}', expected identifer`);
         return {
-            type: "RenameDatabase",
+            type: "AlterDatabaseName",
             name: table_name.value,
             new_name: new_name.value
         }
