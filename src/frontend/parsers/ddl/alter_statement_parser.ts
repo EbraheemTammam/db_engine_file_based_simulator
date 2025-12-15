@@ -2,8 +2,7 @@ import { Parser } from "src/frontend/parser";
 import { Token, TokenType } from "src/interfaces/token";
 import { 
     AlterStatement,
-    RenameDatabaseStatement,
-    RenameIndexStatement
+    RenameStatement,
 } from "src/interfaces/ddl/alter_statement_ast";
 import { AlterTableParser } from "./alter_table_parser";
 
@@ -29,7 +28,7 @@ export class AlterStatementParser extends Parser {
         return statement;
     }
     
-    private parse_rename_database() : RenameDatabaseStatement {
+    private parse_rename_database() : RenameStatement {
         this.consume(TokenType.KEYWORD, 'DATABASE');
         let db_name = this.consume(TokenType.IDENTIFIER);
         if (typeof(db_name.value) !== "string")
@@ -46,7 +45,7 @@ export class AlterStatementParser extends Parser {
         }
     }
     
-    private parse_rename_index() : RenameIndexStatement {
+    private parse_rename_index() : RenameStatement {
         this.consume(TokenType.KEYWORD, 'INDEX');
         let idx_name = this.consume(TokenType.IDENTIFIER);
         if (typeof(idx_name.value) !== "string")

@@ -1,21 +1,20 @@
 import { ASTNode } from "../ast"
 
 export interface AlterStatement extends ASTNode {
-    type: "AlterTableAddColumnStatement" | 
-        //   "AlterTableAddConstraintStatement" | 
+    type: "AlterTableAddColumnStatement" |
           "AlterTableDropColumnStatement" | 
           "AlterTableRenameColumnStatement" |
           "AlterTableAlterColumnDataTypeStatement" |
           "AlterTableAlterColumnDefaultValueStatement" |
           "AlterTableAlterColumnNotNullStatement" |
           "RenameDatabaseStatement" |
+          "RenameTableStatement" |
           "RenameIndexStatement",
     name: string
 }
 
 export interface AlterTableColumnStatement extends AlterStatement {
-    type: "AlterTableAddColumnStatement" | 
-        //   "AlterTableAddConstraintStatement" | 
+    type: "AlterTableAddColumnStatement" |  
           "AlterTableDropColumnStatement" | 
           "AlterTableRenameColumnStatement" |
           "AlterTableAlterColumnDataTypeStatement" |
@@ -33,12 +32,7 @@ export interface AlterTableColumnStatement extends AlterStatement {
     }
 }
 
-export interface RenameDatabaseStatement extends AlterStatement {
-    type: "RenameDatabaseStatement",
-    new_name: string
-}
-
-export interface RenameIndexStatement extends AlterStatement {
-    type: "RenameIndexStatement",
+export interface RenameStatement extends AlterStatement {
+    type: "RenameDatabaseStatement" | "RenameTableStatement" | "RenameIndexStatement",
     new_name: string
 }
