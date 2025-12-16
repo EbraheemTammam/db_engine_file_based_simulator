@@ -9,6 +9,7 @@ export abstract class Executer implements IExecuter {
     protected readonly _object?: string;
     protected readonly _file_handler: IFileHandler;
     protected readonly _analyzer: Analyzer;
+    protected static readonly PAGE_SIZE: number = 200;
 
     constructor(object?: string) {
         this._object = object?.toLowerCase();

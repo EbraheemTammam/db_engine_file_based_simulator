@@ -23,7 +23,7 @@ export class CreateExecuter extends Executer {
                 c.constraints?.reference || ''
             ])
         );
-        await this._file_handler.write_async(`database/data/${statement.name}.csv`, [statement.columns.map(c => c.name)]);
+        await this._file_handler.write_async(`database/data/${statement.name}/page_1.csv`, [statement.columns.map(c => c.name)]);
         return { type: "COMMAND", tag: "CREATE TABLE" }
     }
 }
