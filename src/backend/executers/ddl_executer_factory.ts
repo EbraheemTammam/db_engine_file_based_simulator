@@ -18,24 +18,24 @@ export class DDLExecutionFactory {
             case 'CreateDatabase':
             case 'CreateTable':
             case 'CreateIndex':
-                return new CreateExecuter(this._node, this._node.type.slice(6));
+                return new CreateExecuter(this._node.type.slice(6));
             case 'DropDatabase':
             case 'DropTable':
             case 'DropIndex':
-                return new DropExecuter(this._node, this._node.type.slice(6));
+                return new DropExecuter(this._node.type.slice(6));
             case 'TruncateTable':
-                return new TruncateExecuter(this._node);
+                return new TruncateExecuter();
             case 'AlterColumnAdd':
             case 'AlterColumnDrop':
             case 'AlterColumnName':
             case 'AlterColumnDataType':
             case 'AlterColumnDefaultValue':
             case 'AlterColumnNotNull':
-                return new AlterExecuter(this._node, this._node.type.slice(11));
+                return new AlterExecuter(this._node.type.slice(11));
             case 'AlterDatabaseName':
             case 'AlterTableName':
             case 'AlterIndexName':
-                return new AlterNameExecuter(this._node);
+                return new AlterNameExecuter();
             default:
                 throw new SyntaxError(`unsupported node type ${this._node.type}`);
         }
