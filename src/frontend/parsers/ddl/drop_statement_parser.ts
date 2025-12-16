@@ -8,15 +8,15 @@ export class DropStatementParser extends Parser {
         let next: Token = this.peek();
         let statement: DropStatement;
         switch (next.value) {
-            case "DATABASE":
-                statement = this.parse_drop_database();
-                break;
+            // case "DATABASE":
+            //     statement = this.parse_drop_database();
+            //     break;
             case "TABLE":
                 statement = this.parse_drop_table();
                 break;
-            case "INDEX":
-                statement = this.parse_drop_index();
-                break;
+            // case "INDEX":
+            //     statement = this.parse_drop_index();
+            //     break;
             default:
                 throw new SyntaxError(`expected identifier, got '${next.value}'`);
         }
