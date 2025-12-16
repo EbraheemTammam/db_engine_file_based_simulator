@@ -3,15 +3,18 @@ import { IExecuter } from "src/interfaces/executer";
 import { ExecutionResult } from "src/interfaces/execution_result";
 import { IFileHandler } from "src/interfaces/file_handler";
 import { FileHandler } from "./file_handler";
+import { Analyzer } from "./analyzer";
 
 export abstract class Executer implements IExecuter {
     protected readonly _object?: string;
     protected readonly _file_handler: IFileHandler;
+    protected readonly _analyzer: Analyzer;
 
     constructor(object?: string) {
         this._object = object?.toLowerCase();
         this._file_handler = new FileHandler();
+        this._analyzer = new Analyzer();
     }
 
-    public abstract execute(node: ASTNode): ExecutionResult;
+    public abstract execute(node: ASTNode): Promise<ExecutionResult> | AsyncGenerator<ExecutionResult>;
 }

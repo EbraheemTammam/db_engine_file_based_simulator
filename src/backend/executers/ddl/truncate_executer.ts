@@ -4,7 +4,7 @@ import { TruncateTableStatement } from "src/interfaces/ddl/truncate_statement_as
 import { ExecutionResult } from "src/interfaces/execution_result";
 
 export class TruncateExecuter extends Executer {
-    public override execute(statement: TruncateTableStatement) : ExecutionResult {
+    public override execute(statement: TruncateTableStatement) : Promise<ExecutionResult> {
         throw new NotImplementedException();
     }
 }
