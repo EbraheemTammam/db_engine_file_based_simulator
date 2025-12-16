@@ -1,6 +1,7 @@
 import * as fs from "fs";
 import * as readline from "readline";
 import { finished } from "stream/promises";
+import { mkdir } from "fs/promises";
 import { IFileHandler } from "src/interfaces/file_handler";
 import { data_type, premitive } from "src/interfaces/catalog";
 
@@ -23,6 +24,7 @@ export class FileHandler implements IFileHandler {
 
     public async write_async(path: string, data: premitive[][]): Promise<boolean> {
         try {
+            await mkdir(path.slice(0, path.lastIndexOf('/')), { recursive: true });
             const tmp = path + ".tmp";
             const stream = fs.createWriteStream(tmp);
             for (const row of data)
@@ -39,6 +41,7 @@ export class FileHandler implements IFileHandler {
 
     public async append_async(path: string, data: premitive[][]): Promise<boolean> {
         try {
+            await mkdir(path.slice(0, path.lastIndexOf('/')), { recursive: true });
             const stream = fs.createWriteStream(path, { flags: "a" });
             for (const row of data)
                 stream.write(row.join(',') + "\n");
