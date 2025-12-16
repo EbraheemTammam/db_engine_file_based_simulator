@@ -1,16 +1,29 @@
 import { Injectable } from '@nestjs/common';
+import { DDLExecutionFactory } from 'src/backend/executers/ddl_executer_factory';
 import { Lexer } from 'src/frontend/lexer';
 import { DDLParserFactory } from 'src/frontend/parsers/ddl_parser_factory';
 import { DMLParserFactory } from 'src/frontend/parsers/dml_parser_factory';
 import { ASTNode } from 'src/interfaces/ast';
+import { IExecuter } from 'src/interfaces/executer';
+import { ExecutionResult } from 'src/interfaces/execution_result';
 import { Token, TokenType } from 'src/interfaces/token';
 import { token_array_split } from 'src/utils/token_array_split';
 
 @Injectable()
 export class CoreService {
-    public execute(buffer: string, type: "DDL" | "DML" = "DDL") {
+    public async execute_async(buffer: string, type: "DDL" | "DML" = "DDL") {
         let lexemes: Array<Token> = this.lex(buffer);
-        return type === "DDL" ? this.parse_ddl(lexemes) : this.parse_dml(lexemes);
+        let ASTs: ASTNode[] = type === "DDL" ? this.parse_ddl(lexemes) : this.parse_dml(lexemes);
+        return await this.execute_ddl_async(ASTs);
+    }
+
+    private async execute_ddl_async(nodes: ASTNode[]) : Promise<ExecutionResult[]> {
+        let results: ExecutionResult[] = [];
+        for (const n of nodes) {
+            const executer: IExecuter = new DDLExecutionFactory(n).build();
+            results.push(await executer.execute_async(n) as ExecutionResult);
+        }
+        return results;
     }
 
     private lex(buffer: string) : Token[] {

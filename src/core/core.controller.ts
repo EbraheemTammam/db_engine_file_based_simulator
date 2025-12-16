@@ -1,19 +1,18 @@
 import { Body, Controller, Post} from '@nestjs/common';
 import { CoreService } from './core.service';
-import { error } from 'console';
 
 @Controller('execute')
 export class CoreController {
-    private readonly _service;
+    private readonly _service: CoreService;
 
     constructor(service: CoreService) {
         this._service = service;
     }
 
     @Post('ddl')
-    execute_ddl(@Body() buffer: string) {
+    async execute_ddl(@Body() buffer: string) {
         try {
-            return this._service.execute(buffer);
+            return await this._service.execute_async(buffer);
         }
         catch (e) {
             let now: Date = new Date();
@@ -29,9 +28,9 @@ export class CoreController {
     }
 
     @Post('dml')
-    execute_dml(@Body() buffer: string) {
+    async execute_dml(@Body() buffer: string) {
         try {
-            return this._service.execute(buffer, "DML");
+            return await this._service.execute_async(buffer, "DML");
         }
         catch (e) {
             let now: Date = new Date();
