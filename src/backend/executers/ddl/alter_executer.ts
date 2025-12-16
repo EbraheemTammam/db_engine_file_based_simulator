@@ -11,7 +11,7 @@ export class AlterExecuter extends Executer {
         this._action = action;
     }
 
-    public override execute(statement: AlterColumnStatement) : Promise<ExecutionResult> {
+    public override execute_async(statement: AlterColumnStatement) : Promise<ExecutionResult> {
         throw new NotImplementedException();
     }
 }

@@ -16,5 +16,5 @@ export abstract class Executer implements IExecuter {
         this._analyzer = new Analyzer();
     }
 
-    public abstract execute(node: ASTNode): Promise<ExecutionResult> | AsyncGenerator<ExecutionResult>;
+    public abstract execute_async(node: ASTNode): Promise<ExecutionResult> | AsyncGenerator<ExecutionResult>;
 }
