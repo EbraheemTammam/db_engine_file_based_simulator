@@ -1,4 +1,4 @@
-import { data_type, premitive } from "./table";
+import { data_type, premitive } from "./catalog";
 
 export interface IFileHandler {
     stream_read_async(path: string, schema: data_type[]): AsyncGenerator<premitive[] | false>;

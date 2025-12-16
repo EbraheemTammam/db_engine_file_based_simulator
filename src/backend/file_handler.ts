@@ -2,7 +2,7 @@ import * as fs from "fs";
 import * as readline from "readline";
 import { finished } from "stream/promises";
 import { IFileHandler } from "src/interfaces/file_handler";
-import { data_type, premitive } from "src/interfaces/table";
+import { data_type, premitive } from "src/interfaces/catalog";
 
 export class FileHandler implements IFileHandler {
     public async* stream_read_async(path: string, schema: data_type[]): AsyncGenerator<premitive[] | false> {
