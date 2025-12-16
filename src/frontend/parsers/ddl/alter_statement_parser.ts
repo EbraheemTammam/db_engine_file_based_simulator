@@ -12,14 +12,14 @@ export class AlterStatementParser extends Parser {
         let next: Token = this.peek();
         let statement: AlterStatement;
         switch (next.value) {
-            case "DATABASE":
-                statement = this.parse_rename_database();
-                break;
+            // case "DATABASE":
+            //     statement = this.parse_rename_database();
+            //     break;
             case "TABLE":
                 return (new AlterTableParser(this._lexemes)).parse();
-            case "INDEX":
-                statement = this.parse_rename_index();
-                break;
+            // case "INDEX":
+            //     statement = this.parse_rename_index();
+            //     break;
             default:
                 throw new SyntaxError(`expected identifier, got '${next.value}'`);
         }
