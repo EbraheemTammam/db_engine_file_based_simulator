@@ -3,14 +3,11 @@ export type premitive = string | boolean | number | null;
 export type data_type = 'INT' | 'TEXT' | 'BOOL' | 'SERIAL';
 
 export interface RelationCatalog {
-    id: number,
-    name: string,
-    rows_count: number
+    name: string
 }
 
 export interface AttributeCatalog {
-    id: number,
-    relation_id: number,
+    relation: string,
     name: string,
     type: data_type,
     not_null: boolean,
