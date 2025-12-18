@@ -4,15 +4,18 @@ import {
     AttributeCatalog, 
     data_type, 
     premitive, 
-    RelationCatalog, 
+    RelationCatalog
+} from "src/interfaces/catalog"
+import {
     ATTRIBUTE_CATALOG_DATATYPES, 
     RELATION_CATALOG_DATATYPES,
     ATTRIBUTE_SCHEMA_FILE,
     RELATION_SCHEMA_FILE
-} from "src/interfaces/catalog";
+} from "src/constants/file_path";
 
 export class Analyzer {
     private readonly _file_handler: IFileHandler;
+    private static readonly PAGE_SIZE: number = 100;
 
     constructor() {
         this._file_handler = new FileHandler();
@@ -60,6 +63,10 @@ export class Analyzer {
             buffer.push(this.serialize_relation(relation));
         }
         this._file_handler.write_async(RELATION_SCHEMA_FILE, buffer);
+    }
+
+    public get_page_number(object_id: number) {
+        return Math.ceil(object_id / Analyzer.PAGE_SIZE)
     }
 
     public serialize_relation(relation: RelationCatalog): premitive[] {
