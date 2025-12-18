@@ -1,5 +1,5 @@
 import { Executer } from "src/backend/executer";
-import { TABLE_DIR, TABLE_PAGE_DATA_FILE } from "src/interfaces/catalog";
+import { premitive, RELATION_CATALOG_DATATYPES, RELATION_SCHEMA_FILE, RelationCatalog, TABLE_DIR, TABLE_PAGE_DATA_FILE } from "src/interfaces/catalog";
 import { TruncateTableStatement } from "src/interfaces/ddl/truncate_statement_ast";
 import { ExecutionResult } from "src/interfaces/execution_result";
 
@@ -12,6 +12,17 @@ export class TruncateExecuter extends Executer {
         await this._file_handler.delete_dirs_async(statement.tables.map(name => TABLE_DIR(name)));
         for (const table of statement.tables)
             await this._file_handler.write_async(TABLE_PAGE_DATA_FILE(table, 1), []);
+        let buffer: premitive[][] = [];
+        for await (const row of this._file_handler.stream_read_async(RELATION_SCHEMA_FILE, RELATION_CATALOG_DATATYPES)) {
+            const relation: RelationCatalog = this._analyzer.deserialize_relation(row);
+            if (statement.tables.includes(relation.name)) {
+                relation.row_count = 0;
+                buffer.push(this._analyzer.serialize_relation(relation));
+                continue;
+            }
+            buffer.push(row);
+        }
+        this._file_handler.write_async(RELATION_SCHEMA_FILE, buffer);
         return { type: "COMMAND", tag: "TRUNCATE TABLE" }
     }
 }
