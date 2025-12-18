@@ -7,8 +7,8 @@ export class LogicalConditionParser extends Parser {
     public parse() : LogicalConditionStatement {
         this.consume(TokenType.KEYWORD, 'WHERE');
         const left: Token = this.consume(TokenType.IDENTIFIER);
-        if (typeof(left.value) !== "string")
-            throw new SyntaxError(`unexpected token ${left.value}, expected identifier`);
+        if (left.value !== "id")
+            throw new SyntaxError(`unexpected token ${left.value}, filtering using fields other than id is not supported currently`);
         const operator: Token = this.consume(TokenType.OPERATOR);
         if (typeof(operator.value) !== "string")
             throw new SyntaxError(`unexpected token ${left.value}, expected identifier`);
