@@ -77,6 +77,7 @@ export class FileHandler implements IFileHandler {
 
     private format(line: string, schema: data_type[]) {
         let values: string[] = line.split(',');
+        if (!schema) return values;
         let res: premitive[] = [];
         for (let i = 0; i < values.length; ++i) {
             if (i >= schema.length) {
