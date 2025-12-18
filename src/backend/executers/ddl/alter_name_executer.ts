@@ -1,5 +1,12 @@
 import { Executer } from "src/backend/executer";
-import { ATTRIBUTE_CATALOG_DATATYPES, ATTRIBUTE_SCHEMA_FILE, AttributeCatalog, premitive, RELATION_CATALOG_DATATYPES, RELATION_SCHEMA_FILE, RelationCatalog, TABLE_DIR } from "src/interfaces/catalog";
+import { 
+    ATTRIBUTE_CATALOG_DATATYPES, 
+    ATTRIBUTE_SCHEMA_FILE, 
+    RELATION_CATALOG_DATATYPES, 
+    RELATION_SCHEMA_FILE, 
+    TABLE_DIR 
+} from "src/constants/file_path";
+import { AttributeCatalog, premitive, RelationCatalog } from "src/interfaces/catalog";
 import { RenameStatement } from "src/interfaces/ddl/alter_statement_ast";
 import { ExecutionResult } from "src/interfaces/execution_result";
 

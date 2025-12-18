@@ -1,5 +1,11 @@
 import { Executer } from "src/backend/executer";
-import { premitive, RELATION_CATALOG_DATATYPES, RELATION_SCHEMA_FILE, RelationCatalog, TABLE_DIR, TABLE_PAGE_DATA_FILE } from "src/interfaces/catalog";
+import { 
+    RELATION_CATALOG_DATATYPES, 
+    RELATION_SCHEMA_FILE, 
+    TABLE_DIR, 
+    TABLE_PAGE_DATA_FILE 
+} from "src/constants/file_path";
+import { premitive, RelationCatalog } from "src/interfaces/catalog";
 import { TruncateTableStatement } from "src/interfaces/ddl/truncate_statement_ast";
 import { ExecutionResult } from "src/interfaces/execution_result";
 

@@ -1,5 +1,5 @@
 import { Executer } from "src/backend/executer";
-import { ATTRIBUTE_SCHEMA_FILE, RELATION_SCHEMA_FILE, TABLE_PAGE_DATA_FILE } from "src/interfaces/catalog";
+import { ATTRIBUTE_SCHEMA_FILE, RELATION_SCHEMA_FILE, TABLE_PAGE_DATA_FILE } from "src/constants/file_path";
 import { CreateTableStatement } from "src/interfaces/ddl/create_statement_ast";
 import { ExecutionResult } from "src/interfaces/execution_result";
 

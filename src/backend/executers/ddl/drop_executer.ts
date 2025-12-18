@@ -1,16 +1,14 @@
 import { Executer } from "src/backend/executer";
-import { 
-    AttributeCatalog, 
-    premitive, 
-    RelationCatalog,
+import { AttributeCatalog, premitive, RelationCatalog } from "src/interfaces/catalog";
+import { DropStatement } from "src/interfaces/ddl/drop_statement_ast";
+import { ExecutionResult } from "src/interfaces/execution_result";
+import {
     ATTRIBUTE_SCHEMA_FILE, 
     ATTRIBUTE_CATALOG_DATATYPES, 
     RELATION_CATALOG_DATATYPES, 
     RELATION_SCHEMA_FILE,
     TABLE_DIR
-} from "src/interfaces/catalog";
-import { DropStatement } from "src/interfaces/ddl/drop_statement_ast";
-import { ExecutionResult } from "src/interfaces/execution_result";
+} from "src/constants/file_path"
 
 export class DropExecuter extends Executer {
     public override async execute_async(statement: DropStatement) : Promise<ExecutionResult> {

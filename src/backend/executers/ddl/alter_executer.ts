@@ -1,13 +1,7 @@
 import { NotImplementedException } from "@nestjs/common";
 import { Executer } from "src/backend/executer";
-import { 
-    premitive, 
-    RelationCatalog, 
-    ATTRIBUTE_CATALOG_DATATYPES, 
-    ATTRIBUTE_SCHEMA_FILE, 
-    AttributeCatalog, 
-    TABLE_PAGE_DATA_FILE 
-} from "src/interfaces/catalog";
+import { ATTRIBUTE_CATALOG_DATATYPES, ATTRIBUTE_SCHEMA_FILE, TABLE_PAGE_DATA_FILE } from "src/constants/file_path";
+import { premitive, RelationCatalog, AttributeCatalog } from "src/interfaces/catalog";
 import { AlterColumnStatement } from "src/interfaces/ddl/alter_statement_ast";
 import { ExecutionResult } from "src/interfaces/execution_result";
 
