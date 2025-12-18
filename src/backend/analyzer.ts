@@ -33,7 +33,7 @@ export class Analyzer {
     }
 
     public deserialize_relation(data: premitive[]) : RelationCatalog {
-        return { name: data[0] as string, row_count: data[1] as number };
+        return { name: data[0] as string, column_count: data[1] as number, row_count: data[2] as number };
     }
 
     public deserialize_attribute(data: premitive[]) : AttributeCatalog {
