@@ -66,6 +66,21 @@ export class Analyzer {
         return [relation.name, relation.column_count, relation.row_count, relation.page_count];
     }
 
+    public serialize_attribute(attribute: AttributeCatalog): premitive[] {
+        return [
+            attribute.relation,
+            attribute.name,
+            attribute.index,
+            attribute.type,
+            attribute.not_null,
+            attribute.unique,
+            attribute.default,
+            attribute.pk,
+            attribute.fk,
+            attribute.reference || ""
+        ];
+    }
+
     public deserialize_relation(data: premitive[]): RelationCatalog {
         return { name: data[0] as string, column_count: data[1] as number, row_count: data[2] as number, page_count: data[3] as number };
     }
