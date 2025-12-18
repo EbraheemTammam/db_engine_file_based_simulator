@@ -65,6 +65,22 @@ export class Analyzer {
         this._file_handler.write_async(RELATION_SCHEMA_FILE, buffer);
     }
 
+    public async increment_row_count_async(table_name: string, increment_by: number = 1): Promise<void> {
+        let buffer: premitive[][] = [];
+        for await (const row of this._file_handler.stream_read_async(
+            RELATION_SCHEMA_FILE, RELATION_CATALOG_DATATYPES
+        )) {
+            const relation: RelationCatalog = this.deserialize_relation(row);
+            if (relation.name !== table_name) {
+                buffer.push(row);
+                continue;
+            }
+            relation.row_count += increment_by;
+            buffer.push(this.serialize_relation(relation));
+        }
+        this._file_handler.write_async(RELATION_SCHEMA_FILE, buffer);
+    }
+
     public get_page_number(object_id: number) {
         return Math.ceil(object_id / Analyzer.PAGE_SIZE)
     }
