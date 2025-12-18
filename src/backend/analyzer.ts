@@ -39,6 +39,13 @@ export class Analyzer {
         throw new Error(`relation ${table_name} does not exist`);
     }
 
+    public async get_attribute_catalog_async(table_name: string, column_name: string): Promise<AttributeCatalog> {
+        for await (const row of this._file_handler.stream_read_async(
+            ATTRIBUTE_SCHEMA_FILE, ATTRIBUTE_CATALOG_DATATYPES
+        )) if (row[0] === table_name && row[1] === column_name) return this.deserialize_attribute(row);
+        throw new Error(`attribute ${column_name} does not exist in relation ${table_name}`);
+    }
+
     public async increment_column_count_async(table_name: string, increment_by: number = 1): Promise<void> {
         let buffer: premitive[][] = [];
         for await (const row of this._file_handler.stream_read_async(
