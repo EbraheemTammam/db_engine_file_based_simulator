@@ -25,18 +25,45 @@ export class Analyzer {
         return false;
     }
     
-    public async check_column_existance_async(table_name: string, column_name: string) {
+    public async check_column_existance_async(table_name: string, column_name: string): Promise<boolean> {
         for await (const row of this._file_handler.stream_read_async(
             ATTRIBUTE_SCHEMA_FILE, ATTRIBUTE_CATALOG_DATATYPES
         )) if (row[0] === table_name && row[1] === column_name) return true;
         return false;
     }
 
-    public deserialize_relation(data: premitive[]) : RelationCatalog {
-        return { name: data[0] as string, column_count: data[1] as number, row_count: data[2] as number };
+    public async get_column_count(table_name: string): Promise<number> {
+        for await (const row of this._file_handler.stream_read_async(
+            RELATION_SCHEMA_FILE, RELATION_CATALOG_DATATYPES
+        )) if (row[0] === table_name) return row[1] as number;
+        return -1;
     }
 
-    public deserialize_attribute(data: premitive[]) : AttributeCatalog {
+    public async increment_column_count(table_name: string, increment_by: number = 1): Promise<void> {
+        let buffer: premitive[][] = [];
+        for await (const row of this._file_handler.stream_read_async(
+            RELATION_SCHEMA_FILE, RELATION_CATALOG_DATATYPES
+        )) {
+            const relation: RelationCatalog = this.deserialize_relation(row);
+            if (relation.name !== table_name) {
+                buffer.push(row);
+                continue;
+            }
+            relation.column_count += increment_by;
+            buffer.push(this.serialize_relation(relation));
+        }
+        this._file_handler.write_async(RELATION_SCHEMA_FILE, buffer);
+    }
+
+    public serialize_relation(relation: RelationCatalog): premitive[] {
+        return [relation.name, relation.column_count, relation.row_count, relation.page_count];
+    }
+
+    public deserialize_relation(data: premitive[]): RelationCatalog {
+        return { name: data[0] as string, column_count: data[1] as number, row_count: data[2] as number, page_count: data[3] as number };
+    }
+
+    public deserialize_attribute(data: premitive[]): AttributeCatalog {
         return {
             relation: data[0] as string,
             name: data[1] as string,
