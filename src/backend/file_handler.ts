@@ -15,7 +15,7 @@ export class FileHandler implements IFileHandler {
             yield this.format(line, schema);
     }
 
-    public async write_async(path: string, data: premitive[][]): Promise<boolean> {
+    public async write_async(path: string, data: premitive[][] = []): Promise<boolean> {
         try {
             await mkdir(path.slice(0, path.lastIndexOf('/')), { recursive: true });
             const tmp = path + ".tmp";
@@ -79,6 +79,10 @@ export class FileHandler implements IFileHandler {
         let values: string[] = line.split(',');
         let res: premitive[] = [];
         for (let i = 0; i < values.length; ++i) {
+            if (i >= schema.length) {
+                res.push(values[i]);
+                continue;
+            }
             switch (schema[i]) {
                 case 'INT':
                 case 'SERIAL':
