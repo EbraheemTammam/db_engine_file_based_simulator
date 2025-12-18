@@ -32,14 +32,14 @@ export class Analyzer {
         return false;
     }
 
-    public async get_column_count(table_name: string): Promise<number> {
+    public async get_relation_catalog_async(table_name: string): Promise<RelationCatalog> {
         for await (const row of this._file_handler.stream_read_async(
             RELATION_SCHEMA_FILE, RELATION_CATALOG_DATATYPES
-        )) if (row[0] === table_name) return row[1] as number;
-        return -1;
+        )) if (row[0] === table_name) return this.deserialize_relation(row);
+        throw new Error(`relation ${table_name} does not exist`);
     }
 
-    public async increment_column_count(table_name: string, increment_by: number = 1): Promise<void> {
+    public async increment_column_count_async(table_name: string, increment_by: number = 1): Promise<void> {
         let buffer: premitive[][] = [];
         for await (const row of this._file_handler.stream_read_async(
             RELATION_SCHEMA_FILE, RELATION_CATALOG_DATATYPES
