@@ -117,9 +117,9 @@ export class AlterTableParser extends Parser {
         switch (behavior.value) {
             case 'SET':
                 switch (next.value) {
-                    case 'DATATYPE':
-                        statement = parse_alter_column_datatype(this, table_name, col_name);
-                        break;
+                    // case 'DATATYPE':
+                    //     statement = parse_alter_column_datatype(this, table_name, col_name);
+                    //     break;
                     case 'DEFAULT':
                         statement = parse_alter_column_default_value(this, table_name, col_name, true);
                         break;
