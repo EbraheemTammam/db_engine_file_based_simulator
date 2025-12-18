@@ -13,8 +13,8 @@ export class LogicalConditionParser extends Parser {
         if (operator.value !== "=")
             throw new SyntaxError(`unexpected token ${left.value}, only = operator is supported currently`);
         const right: Token = this.consume();
-        if (![TokenType.STRING, TokenType.NUMBER, TokenType.NULL, TokenType.BOOLEAN].includes(right.type))
-            throw new SyntaxError(`unexpected token ${left.value}, expected a literal`);
+        if (right.type !== TokenType.NUMBER)
+            throw new SyntaxError(`unexpected token ${left.value}, expected a number literal`);
         return {
             type: "LogicalCondition",
             left: left.value,
