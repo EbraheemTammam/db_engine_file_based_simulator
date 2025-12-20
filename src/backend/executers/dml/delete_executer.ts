@@ -23,7 +23,7 @@ export class DeleteExecuter extends Executer {
         const page_count: number = (await this._analyzer.get_relation_catalog_async(statement.table_name)).page_count;
         if (page_number > page_count)
             throw new Error(`object with id ${id} does not exist`);
-        let buffer: premitive[][] = [];
+        const buffer: premitive[][] = [];
         let found = false;
         for await (const row of this._file_handler.stream_read_async(TABLE_PAGE_DATA_FILE(statement.table_name, page_number))) {
             if (Number(row[0]) === id) {
@@ -43,7 +43,7 @@ export class DeleteExecuter extends Executer {
             throw new Error(`table ${statement.table_name} does not exist`);
         await this._file_handler.delete_dirs_async([statement.table_name]);
         await this._file_handler.write_async(TABLE_PAGE_DATA_FILE(statement.table_name, 1), []);
-        let catalog: RelationCatalog = await this._analyzer.get_relation_catalog_async(statement.table_name);
+        const catalog: RelationCatalog = await this._analyzer.get_relation_catalog_async(statement.table_name);
         this._analyzer.increment_row_count_async(statement.table_name, -1 * catalog.row_count)
         return catalog.row_count;
     }

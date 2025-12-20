@@ -18,7 +18,7 @@ export class TruncateExecuter extends Executer {
         await this._file_handler.delete_dirs_async(statement.tables.map(name => TABLE_DIR(name)));
         for (const table of statement.tables)
             await this._file_handler.write_async(TABLE_PAGE_DATA_FILE(table, 1), []);
-        let buffer: premitive[][] = [];
+        const buffer: premitive[][] = [];
         for await (const row of this._file_handler.stream_read_async(RELATION_SCHEMA_FILE, RELATION_CATALOG_DATATYPES)) {
             const relation: RelationCatalog = this._analyzer.deserialize_relation(row);
             if (statement.tables.includes(relation.name)) {

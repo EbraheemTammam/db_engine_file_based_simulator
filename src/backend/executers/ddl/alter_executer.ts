@@ -63,9 +63,8 @@ export class AlterExecuter extends Executer {
             ]
         );
         await this._analyzer.increment_column_count_async(statement.name);
-        let buffer: premitive[][];
         for (let page_number: number = 1; page_number <= catalog.page_count; ++page_number) {
-            buffer = [];
+            const buffer: premitive[][] = [];
             for await (const row of this._file_handler.stream_read_async(TABLE_PAGE_DATA_FILE(statement.name, page_number)))
                 buffer.push([...row, statement.constraints?.default || null])
             await this._file_handler.write_async(TABLE_PAGE_DATA_FILE(statement.name, page_number), buffer);
@@ -73,7 +72,7 @@ export class AlterExecuter extends Executer {
     }
 
     private async drop_column(statement: AlterColumnStatement): Promise<void> {
-        let buffer: premitive[][] = [];
+        const buffer: premitive[][] = [];
         for await (const row of this._file_handler.stream_read_async(ATTRIBUTE_SCHEMA_FILE, ATTRIBUTE_CATALOG_DATATYPES)) {
             if (row[0] === statement.name && row[1] === statement.column_name) continue;
             buffer.push(row);
@@ -83,7 +82,7 @@ export class AlterExecuter extends Executer {
         const page_count: number = (await this._analyzer.get_relation_catalog_async(statement.name)).page_count;
         const column_index: number = (await this._analyzer.get_attribute_catalog_async(statement.name, statement.column_name)).index;
         for (let page_number: number = 1; page_number <= page_count; ++page_number) {
-            buffer = [];
+            const buffer: premitive[][] = [];
             for await (const row of this._file_handler.stream_read_async(TABLE_PAGE_DATA_FILE(statement.name, page_number)))
                 buffer.push([...row.slice(0, column_index), ...row.slice(column_index + 1)]);
             await this._file_handler.write_async(TABLE_PAGE_DATA_FILE(statement.name, page_number), buffer);
@@ -93,7 +92,7 @@ export class AlterExecuter extends Executer {
     private async rename_column(statement: AlterColumnStatement): Promise<void> {
         if (await this._analyzer.check_column_existance_async(statement.name, statement.new_name!))
             throw new Error(`column ${statement.name} already exists`);
-        let buffer: premitive[][] = [];
+        const buffer: premitive[][] = [];
         for await (const row of this._file_handler.stream_read_async(ATTRIBUTE_SCHEMA_FILE, ATTRIBUTE_CATALOG_DATATYPES)) {
             if (row[0] === statement.name && row[1] === statement.column_name) {
                 row[1] = statement.new_name!;
@@ -111,7 +110,7 @@ export class AlterExecuter extends Executer {
     }
 
     private async alter_column_default_value(statement: AlterColumnStatement): Promise<void> {
-        let buffer: premitive[][] = [];
+        const buffer: premitive[][] = [];
         for await (const row of this._file_handler.stream_read_async(ATTRIBUTE_SCHEMA_FILE, ATTRIBUTE_CATALOG_DATATYPES)) {
             if (row[0] === statement.name && row[1] === statement.column_name) {
                 const attribute: AttributeCatalog = this._analyzer.deserialize_attribute(row);
