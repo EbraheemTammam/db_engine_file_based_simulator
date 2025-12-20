@@ -1,14 +1,11 @@
 import { ASTNode } from "../ast";
+import { premitive } from "../catalog";
 import { LogicalConditionStatement } from "./logical_condition_ast";
-
-export interface ColumnUpdate {
-    column_name: string,
-    value: string | boolean | number | null | "DEFAULT"
-}
 
 export interface UpdateStatement extends ASTNode {
     type: "Update",
     table: string,
-    updates: ColumnUpdate[],
+    columns: string[],
+    values: (premitive | "DEFAULT")[],
     condition?: LogicalConditionStatement
 }

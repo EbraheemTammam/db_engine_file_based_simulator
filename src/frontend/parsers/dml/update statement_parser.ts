@@ -1,7 +1,8 @@
 import { Parser } from "src/frontend/parser";
-import { ColumnUpdate, UpdateStatement } from "src/interfaces/dml/update_statement_ast";
+import { UpdateStatement } from "src/interfaces/dml/update_statement_ast";
 import { Token, TokenType } from "src/interfaces/token";
 import { LogicalConditionParser } from "./logical_condition_parser";
+import { premitive } from "src/interfaces/catalog";
 
 export class UpdateStatementParser extends Parser {
     parse() : UpdateStatement {
@@ -13,18 +14,17 @@ export class UpdateStatementParser extends Parser {
         let statement: UpdateStatement = {
             type: "Update",
             table: table_name.value,
-            updates: new Array<ColumnUpdate>()
+            columns: new Array<string>(),
+            values: new Array<premitive | "DEFAULT">()
         }
         while (true) {
             let col_name: Token = this.consume(TokenType.IDENTIFIER);
             if (typeof(col_name.value) !== "string")
-                throw new SyntaxError(``);
+                throw new SyntaxError(`unexpected token ${col_name.value}, expected identifier`);
             this.consume(TokenType.OPERATOR, '=');
             let col_value: Token = this.consume();
-            statement.updates.push({
-                column_name: col_name.value,
-                value: col_value.type == TokenType.NULL ? null : col_value.value!
-            })
+            statement.columns.push(col_name.value);
+            statement.values.push(col_value.type === TokenType.NULL ? null : col_value.value!);
             if (this.is_eof() || this.peek().type !== TokenType.COMMA) break;
             this.consume(TokenType.COMMA);
         }
