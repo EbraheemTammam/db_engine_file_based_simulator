@@ -97,6 +97,7 @@ export class Analyzer {
             for (let i: number = 0; i < catalogs.length; ++i) {
                 switch (true) {
                     case row[i] === "DEFAULT":
+                    case !catalogs[i].not_null && row[i] === null:
                     case catalogs[i].type === "BOOL" && typeof(row[i]) === "boolean":
                     case catalogs[i].type === "TEXT" && typeof(row[i]) === "string":
                     case catalogs[i].type === "INT" && typeof(row[i]) === "number":
