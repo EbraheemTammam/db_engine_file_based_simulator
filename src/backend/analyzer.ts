@@ -12,6 +12,7 @@ import {
     ATTRIBUTE_SCHEMA_FILE,
     RELATION_SCHEMA_FILE
 } from "src/constants/file_path";
+import { range } from "rxjs";
 
 export class Analyzer {
     private readonly _file_handler: IFileHandler;
@@ -67,12 +68,12 @@ export class Analyzer {
         return res;
     }
 
-    public async get_column_indexes_async(table: string, columns: string[] | null = null): Promise<number[]> {
-        return (
-            columns === null ?
-            await this.get_table_attributes_catalogs_async(table) :
-            await this.get_attributes_catalogs_async(table, columns)
-        ).map(catalog => catalog.index);
+    public async get_column_indexes_async(table: string, columns: string[] | undefined = undefined): Promise<number[]> {
+        if (columns === undefined) {
+            let column_count: number = (await this.get_relation_catalog_async(table)).column_count;
+            return Array.from({ length: column_count + 1 }, (_, i) => i);
+        }
+        return (await this.get_attributes_catalogs_async(table, columns)).map(catalog => catalog.index);            
     }
 
     public async validate_column_datatypes_async(table: string, columns: string[] | undefined = undefined, values: premitive[][]): Promise<void> {
