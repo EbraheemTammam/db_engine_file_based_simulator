@@ -57,8 +57,9 @@ export class Analyzer {
         throw new Error(`attributes ${column_names.filter(name => !found_names.includes(name)).join(', ')} does not exist in relation ${table_name}`);
     }
 
-    public async get_excluded_attributes_async(table_name: string, column_names: string[]): Promise<AttributeCatalog[]> {
+    public async get_excluded_attributes_async(table_name: string, column_names?: string[]): Promise<AttributeCatalog[]> {
         const res: AttributeCatalog[] = [];
+        if (column_names === undefined) return res;
         for await (const row of this._file_handler.stream_read_async(
             ATTRIBUTE_SCHEMA_FILE, ATTRIBUTE_CATALOG_DATATYPES
         )) {
