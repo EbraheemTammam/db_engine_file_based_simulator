@@ -45,8 +45,9 @@ export class DeleteExecuter extends Executer {
         await this._file_handler.delete_dirs_async([statement.table_name]);
         await this._file_handler.write_async(TABLE_PAGE_DATA_FILE(statement.table_name, 1), []);
         const catalog: RelationCatalog = await this._analyzer.get_relation_catalog_async(statement.table_name);
+        const count: number = catalog.row_count;
         catalog.row_count = 0;
         await this._analyzer.update_relation_schema_async(catalog);
-        return catalog.row_count;
+        return count;
     }
 }
