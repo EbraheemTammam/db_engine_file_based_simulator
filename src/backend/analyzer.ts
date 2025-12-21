@@ -56,6 +56,42 @@ export class Analyzer {
         throw new Error(`attributes ${column_names.filter(name => !found_names.includes(name)).join(', ')} does not exist in relation ${table_name}`);
     }
 
+    public async get_table_attributes_catalogs_async(table_name: string): Promise<AttributeCatalog[]> {
+        const res: AttributeCatalog[] = [];
+        for await (const row of this._file_handler.stream_read_async(
+            ATTRIBUTE_SCHEMA_FILE, ATTRIBUTE_CATALOG_DATATYPES
+        )) {
+            if (row[0] === table_name) 
+                res.push(this.deserialize_attribute(row));
+        };
+        return res;
+    }
+
+    public async get_column_indexes_async(table: string, columns: string[] | null = null): Promise<number[]> {
+        return (
+            columns === null ?
+            await this.get_table_attributes_catalogs_async(table) :
+            await this.get_attributes_catalogs_async(table, columns)
+        ).map(catalog => catalog.index);
+    }
+
+    public async validate_column_datatypes_async(table: string, columns: string[], values: premitive[][]): Promise<void> {
+        const catalogs: AttributeCatalog[] = await this.get_attributes_catalogs_async(table, columns);
+        for (const row of values) {
+            for (let i: number = 0; i < catalogs.length; ++i) {
+                switch (true) {
+                    case catalogs[i].type === "BOOL" && typeof(row[i]) === "boolean":
+                    case catalogs[i].type === "TEXT" && typeof(row[i]) === "string":
+                    case catalogs[i].type === "INT" && typeof(row[i]) === "number":
+                    case catalogs[i].type === "SERIAL" && typeof(row[i]) === "number":
+                        break;
+                    default:
+                        throw new Error(`value '${row[i]}' can not be assigned to column of type ${catalogs[i].type}`);
+                }
+            }
+        }
+    }
+
     public async increment_column_count_async(table_name: string, increment_by: number = 1): Promise<void> {
         let buffer: premitive[][] = [];
         for await (const row of this._file_handler.stream_read_async(
