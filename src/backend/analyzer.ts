@@ -57,6 +57,17 @@ export class Analyzer {
         throw new Error(`attributes ${column_names.filter(name => !found_names.includes(name)).join(', ')} does not exist in relation ${table_name}`);
     }
 
+    public async get_excluded_attributes_async(table_name: string, column_names: string[]): Promise<AttributeCatalog[]> {
+        const res: AttributeCatalog[] = [];
+        for await (const row of this._file_handler.stream_read_async(
+            ATTRIBUTE_SCHEMA_FILE, ATTRIBUTE_CATALOG_DATATYPES
+        )) {
+            if (row[0] === table_name && !column_names.includes(row[1] as string)) 
+                res.push(this.deserialize_attribute(row));
+        };
+        return res;
+    }
+
     public async get_table_attributes_catalogs_async(table_name: string): Promise<AttributeCatalog[]> {
         const res: AttributeCatalog[] = [];
         for await (const row of this._file_handler.stream_read_async(
@@ -179,7 +190,7 @@ export class Analyzer {
             type: data[3] as data_type,
             not_null: data[4] as boolean,
             unique: data[5] as boolean,
-            default: data[6] as premitive,
+            default: data[6] === '' ? null : data[6] as premitive,
             pk: data[7] as boolean,
             fk: data[8] as boolean,
             reference: data.length > 8 ? data[9] as string : undefined
