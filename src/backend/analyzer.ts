@@ -75,8 +75,12 @@ export class Analyzer {
         ).map(catalog => catalog.index);
     }
 
-    public async validate_column_datatypes_async(table: string, columns: string[], values: premitive[][]): Promise<void> {
-        const catalogs: AttributeCatalog[] = await this.get_attributes_catalogs_async(table, columns);
+    public async validate_column_datatypes_async(table: string, columns: string[] | undefined = undefined, values: premitive[][]): Promise<void> {
+        const catalogs: AttributeCatalog[] = (
+            columns === undefined ?
+            await this.get_table_attributes_catalogs_async(table) :
+            await this.get_attributes_catalogs_async(table, columns)
+        );
         for (const row of values) {
             for (let i: number = 0; i < catalogs.length; ++i) {
                 switch (true) {
