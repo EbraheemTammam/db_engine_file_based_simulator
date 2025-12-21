@@ -10,13 +10,13 @@ import {
     ATTRIBUTE_CATALOG_DATATYPES, 
     RELATION_CATALOG_DATATYPES,
     ATTRIBUTE_SCHEMA_FILE,
-    RELATION_SCHEMA_FILE
+    RELATION_SCHEMA_FILE,
+    TABLE_PAGE_DATA_FILE
 } from "src/constants/file_path";
-import { range } from "rxjs";
 
 export class Analyzer {
     private readonly _file_handler: IFileHandler;
-    private static readonly PAGE_SIZE: number = 100;
+    public static readonly PAGE_SIZE: number = 100;
 
     constructor() {
         this._file_handler = new FileHandler();
@@ -136,10 +136,24 @@ export class Analyzer {
                         throw new Error(`column ${catalogs[i].name} has no default value specified`);
                     row[i] = catalogs[i].default;
                 }
-                res.push(row);
             }
+            res.push(row);
         }
         return res;
+    }
+
+    public async validate_unique_constraints(relation: string, indexes: number[], values: premitive[][]): Promise<void> {
+        const catalog: RelationCatalog = await this.get_relation_catalog_async(relation);
+        for (let i: number = 1; i <= catalog.page_count; ++i) {
+            for await (const line of this._file_handler.stream_read_async(TABLE_PAGE_DATA_FILE(relation, i))) {
+                for (const row of values) {
+                    for (const index of indexes) {
+                        if (row[index] === line[index])
+                            throw new Error(`value ${row[index]} violates unique constraints`);
+                    }
+                }
+            }
+        }
     }
 
     public async update_relation_schema_async(catalog: RelationCatalog): Promise<void> {
