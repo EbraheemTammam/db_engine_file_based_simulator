@@ -125,6 +125,23 @@ export class Analyzer {
         }
     }
 
+    public validate_not_null(catalogs: AttributeCatalog[], values: premitive[][]): premitive[][] {
+        const res: premitive[][] = [];
+        for (const row of values) {
+            for (let i: number = 0; i < row.length; ++i) {
+                if (row[i] === null && catalogs[i].not_null)
+                    throw new Error(`column ${catalogs[i].name} can not be null`);
+                else if (row[i] === "DEFAULT") {
+                    if (catalogs[i].default === null)
+                        throw new Error(`column ${catalogs[i].name} has no default value specified`);
+                    row[i] = catalogs[i].default;
+                }
+                res.push(row);
+            }
+        }
+        return res;
+    }
+
     public async increment_column_count_async(table_name: string, increment_by: number = 1): Promise<void> {
         let buffer: premitive[][] = [];
         for await (const row of this._file_handler.stream_read_async(
@@ -162,7 +179,13 @@ export class Analyzer {
     }
 
     public serialize_relation(relation: RelationCatalog): premitive[] {
-        return [relation.name, relation.column_count, relation.row_count, relation.page_count];
+        return [
+            relation.name, 
+            relation.column_count, 
+            relation.row_count, 
+            relation.page_count,
+            relation.last_index
+        ];
     }
 
     public serialize_attribute(attribute: AttributeCatalog): premitive[] {
@@ -181,7 +204,13 @@ export class Analyzer {
     }
 
     public deserialize_relation(data: premitive[]): RelationCatalog {
-        return { name: data[0] as string, column_count: data[1] as number, row_count: data[2] as number, page_count: data[3] as number };
+        return { 
+            name: data[0] as string, 
+            column_count: data[1] as number, 
+            row_count: data[2] as number, 
+            page_count: data[3] as number,
+            last_index: data[4] as number 
+        };
     }
 
     public deserialize_attribute(data: premitive[]): AttributeCatalog {

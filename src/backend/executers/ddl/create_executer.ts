@@ -9,7 +9,7 @@ export class CreateExecuter extends Executer {
             if (statement.skip_if_exists) return { type: "COMMAND", tag: "CREATE TABLE" }
             throw new Error(`table ${statement.name} already exists`);
         }
-        await this._file_handler.append_async(RELATION_SCHEMA_FILE, [[statement.name, statement.columns.length, 0, 1]]);
+        await this._file_handler.append_async(RELATION_SCHEMA_FILE, [[statement.name, statement.columns.length, 0, 1, 0]]);
         let index: number = 0;
         await this._file_handler.append_async(
             ATTRIBUTE_SCHEMA_FILE,

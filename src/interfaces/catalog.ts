@@ -6,7 +6,8 @@ export interface RelationCatalog {
     name: string,
     column_count: number,
     row_count: number,
-    page_count: number
+    page_count: number,
+    last_index: number
 }
 
 export interface AttributeCatalog {
