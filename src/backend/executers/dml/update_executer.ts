@@ -8,7 +8,7 @@ export class UpdateExecuter extends Executer {
     public async execute_async(statement: UpdateStatement): Promise<ExecutionResult> {
         if ((new Set<string>(statement.columns)).size < statement.columns.length)
             throw new Error('multiple assignments to the same column');
-        this.validate_column_datatypes_async(statement);
+        await this.validate_column_datatypes_async(statement);
         let row_count: number = 1;
         switch (statement.condition) {
             case undefined:
