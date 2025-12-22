@@ -206,8 +206,7 @@ export class Analyzer {
         if (statement === undefined) return [1, relation_catalog.page_count];
         const attribute_catalog: AttributeCatalog = (await this.get_attributes_catalogs_async(relation, [statement.left as string]))[0];
         const pivot_page_number: number = this.get_page_number(statement.right as number);
-        if (pivot_page_number > relation_catalog.page_count) // need to be handled
-            throw new Error(`object with ${statement.left} = ${statement.right} does not exist`);
+        if (pivot_page_number > relation_catalog.page_count) return [0, -1];
         if (!attribute_catalog.pk) return [1, relation_catalog.page_count];
         else switch (statement.operator) {
             case "=":
