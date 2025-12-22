@@ -43,7 +43,8 @@ export class SelectStatementParser extends Parser {
             let keyword: Token = this.consume(TokenType.KEYWORD);
             switch (keyword.value) {
                 case 'WHERE':
-                    statement.condition = (new LogicalConditionParser(this._lexemes.slice(this._cursor))).parse();
+                    statement.condition = (new LogicalConditionParser(this._lexemes.slice(this._cursor - 1))).parse();
+                    this._cursor += 3;
                     break;
                 case 'GROUP':
                     this.consume(TokenType.KEYWORD, 'BY');
