@@ -53,8 +53,10 @@ export class Analyzer {
             if (res.length === column_names.length) break;
         };
         if (res.length === column_names.length) return res;
-        const found_names: string[] = res.map(catalog => catalog.name);
-        throw new Error(`attributes ${column_names.filter(name => !found_names.includes(name)).join(', ')} does not exist in relation ${table_name}`);
+        const found_names: string[] = res.map(catalog => catalog.name).concat(['*']);
+        const not_found: string[] = column_names.filter(name => !found_names.includes(name));
+        if (not_found.length === 0) return res;
+        throw new Error(`attributes ${not_found.join(', ')} does not exist in relation ${table_name}`);
     }
 
     public async get_excluded_attributes_async(table_name: string, column_names?: string[]): Promise<AttributeCatalog[]> {
