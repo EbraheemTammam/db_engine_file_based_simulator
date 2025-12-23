@@ -95,7 +95,7 @@ export class CoreService {
         });
         await handler.append_async(DAY_LOGS_FILE(now.toLocaleDateString().replaceAll('/', '-')), queries.map(query => {
             console.log(`\x1b[32m[${now.toLocaleDateString()} ${now.toLocaleTimeString()}] [INFO ] ${query}\x1b[0m`);
-            return [`${now.toLocaleDateString()} ${now.toLocaleTimeString()}`, true, query];
+            return [`${now.toLocaleDateString()} ${now.toLocaleTimeString()}`, query];
         }));
     }
 }

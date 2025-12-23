@@ -1,12 +1,15 @@
-import { Body, Controller, Post} from '@nestjs/common';
+import { Body, Controller, Get, Post, Query, ValidationPipe} from '@nestjs/common';
 import { CoreService } from './core.service';
 import { isInstance } from 'class-validator';
 import { ExecutionResult } from 'src/interfaces/execution_result';
 import { Token, TokenType } from 'src/interfaces/token';
 import { token_array_split } from 'src/utils/token_array_split';
 import { ASTNode } from 'src/interfaces/ast';
+import { IFileHandler } from 'src/interfaces/file_handler';
+import { FileHandler } from 'src/backend/file_handler';
+import { DAY_LOGS_FILE } from 'src/constants/file_path';
 
-@Controller('execute')
+@Controller()
 export class CoreController {
     private readonly _service: CoreService;
 
@@ -14,7 +17,7 @@ export class CoreController {
         this._service = service;
     }
 
-    @Post('ddl')
+    @Post('execute/ddl')
     async execute_ddl(@Body() buffer: string) {
         try {
             const lexemes: Token[][] = token_array_split(
@@ -39,7 +42,7 @@ export class CoreController {
         }
     }
 
-    @Post('dml')
+    @Post('execute/dml')
     async execute_dml(@Body() buffer: string) {
         try {
             const lexemes: Token[][] = token_array_split(
@@ -61,6 +64,22 @@ export class CoreController {
             const syntax_error: boolean = isInstance(e, SyntaxError);
             console.error(`\x1b[31m[${now.toLocaleDateString()} ${now.toLocaleTimeString()}] [ERROR] ${syntax_error ? 'SyntaxError: ' : ''}${e.message} ${error_with_location}\x1b[0m`);
             return {'error': e.message}
+        }
+    }
+
+    @Get('history')
+    async get_history(@Query("date", ValidationPipe) date?: string) {
+        const handler: IFileHandler = new FileHandler();
+        if (date === undefined)
+            date = (new Date()).toLocaleDateString();
+        try {
+            const buffer: { time: string, query: string }[] = [];
+            for await (const line of handler.stream_read_async(DAY_LOGS_FILE(date.replaceAll('/', '-'))))
+            buffer.push({ time: line[0] as string, query: line[1] as string });
+            return buffer;
+        }
+        catch {
+            return [];
         }
     }
 }
