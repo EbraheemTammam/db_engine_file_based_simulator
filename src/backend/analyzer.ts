@@ -13,6 +13,7 @@ import {
     RELATION_SCHEMA_FILE,
     TABLE_PAGE_DATA_FILE
 } from "src/constants/file_path";
+import { LogicalConditionStatement } from "src/interfaces/dml/logical_condition_ast";
 
 export class Analyzer {
     private readonly _file_handler: IFileHandler;
@@ -174,6 +175,53 @@ export class Analyzer {
 
     public get_page_number(object_id: number) {
         return Math.ceil(object_id / Analyzer.PAGE_SIZE);
+    }
+
+    public async construct_logical_lambda_async(
+        table: string, 
+        statement?: LogicalConditionStatement
+    ): Promise<((a: premitive, b: premitive) => boolean)> {
+        if (statement === undefined) return function (a: premitive, b: premitive): boolean { return true; };
+        await this.validate_column_datatypes_async(table, [statement.left as string], [[statement.right as premitive]]);
+        switch (statement.operator) {
+            case "=":
+                return function (a: premitive, b: premitive): boolean { return a == b; } 
+            case ">":
+                return function (a: premitive, b: premitive): boolean { return a == null || b == null ? false : a > b; }
+            case "<":
+                return function (a: premitive, b: premitive): boolean { return a == null || b == null ? false : a < b; }
+            case "!=":
+                return function (a: premitive, b: premitive): boolean { return a != b; }
+            case ">=":
+                return function (a: premitive, b: premitive): boolean { return a == null || b == null ? false : a >= b; }
+            case "<=":
+                return function (a: premitive, b: premitive): boolean { return a == null || b == null ? false : a <= b; }
+            default:
+                throw new Error(`operator ${statement.operator} is not supported`);
+        }
+    }
+
+    public async calculate_range_query_pages_async(relation: string, statement?: LogicalConditionStatement): Promise<[start: number, end: number]> {
+        const relation_catalog: RelationCatalog = await this.get_relation_catalog_async(relation);
+        if (statement === undefined) return [1, relation_catalog.page_count];
+        const attribute_catalog: AttributeCatalog = (await this.get_attributes_catalogs_async(relation, [statement.left as string]))[0];
+        const pivot_page_number: number = this.get_page_number(statement.right as number);
+        if (pivot_page_number > relation_catalog.page_count) return [0, -1];
+        if (!attribute_catalog.pk) return [1, relation_catalog.page_count];
+        else switch (statement.operator) {
+            case "=":
+                return [pivot_page_number, pivot_page_number];
+            case "!=":
+                return [1, relation_catalog.page_count];
+            case ">":
+            case ">=":
+                return [pivot_page_number, relation_catalog.page_count];
+            case "<":
+            case "<=":
+                return [1, pivot_page_number];
+            default:
+                throw new Error(`operator ${statement.operator} is not supported`);
+        }
     }
 
     public serialize_relation(relation: RelationCatalog): premitive[] {

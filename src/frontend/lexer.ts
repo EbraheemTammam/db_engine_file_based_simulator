@@ -118,12 +118,7 @@ export class Lexer {
             }
 
             // operators
-            if (["=", "<", ">", "+" , "-" , "*" , "/" , "%"].includes(char)) {
-                this._tokens.push({'type': TokenType.OPERATOR, 'value': char});
-                ++this._cursor;
-                continue;
-            }
-            else if (
+            if (
                 this._cursor < this._buffer_size - 1 &&
                 ["!=", "<>", "<=", ">=", "||"].includes(this._buffer.slice(this._cursor, this._cursor + 2))
             ) {
@@ -134,6 +129,11 @@ export class Lexer {
                     }
                 );
                 this._cursor += 2;
+                continue;
+            }
+            else if (["=", "<", ">", "+" , "-" , "*" , "/" , "%"].includes(char)) {
+                this._tokens.push({'type': TokenType.OPERATOR, 'value': char});
+                ++this._cursor;
                 continue;
             }
 
