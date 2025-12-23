@@ -5,11 +5,14 @@ import { ExecutionResult } from "src/interfaces/execution_result";
 
 export class CreateExecuter extends Executer {
     public override async execute_async(statement: CreateTableStatement): Promise<ExecutionResult> {
+        // check if table exists
         if (await this._analyzer.check_table_existance_async(statement.name)) {
             if (statement.skip_if_exists) return { type: "COMMAND", tag: "CREATE TABLE" }
             throw new Error(`table ${statement.name} already exists`);
         }
+        // append relation info to relations file
         await this._file_handler.append_async(RELATION_SCHEMA_FILE, [[statement.name, statement.columns.length, 0, 1, 0]]);
+        // append attributes info to attributes file
         let index: number = 0;
         await this._file_handler.append_async(
             ATTRIBUTE_SCHEMA_FILE,
@@ -26,6 +29,7 @@ export class CreateExecuter extends Executer {
                 c.constraints?.reference || ''
             ])
         );
+        // create first page file
         await this._file_handler.write_async(TABLE_PAGE_DATA_FILE(statement.name, 1), []);
         return { type: "COMMAND", tag: "CREATE TABLE" }
     }

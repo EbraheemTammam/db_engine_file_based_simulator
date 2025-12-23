@@ -12,8 +12,13 @@ import { ExecutionResult } from "src/interfaces/execution_result";
 
 export class AlterNameExecuter extends Executer {
     public override async execute_async(statement: RenameStatement) : Promise<ExecutionResult> {
+        // check if table does not exist
+        if (!await this._analyzer.check_table_existance_async(statement.name))
+            throw new Error(`table ${statement.name} does not exist`);
+        // check if new name already exists
         if (await this._analyzer.check_table_existance_async(statement.new_name))
             throw new Error(`table ${statement.new_name} already exists`);
+        // otherwise rewrite relations file
         let buffer: premitive[][] = [];
         for await (const row of this._file_handler.stream_read_async(RELATION_SCHEMA_FILE, RELATION_CATALOG_DATATYPES)) {
             const relation: RelationCatalog = this._analyzer.deserialize_relation(row);
@@ -25,6 +30,7 @@ export class AlterNameExecuter extends Executer {
             buffer.push(this._analyzer.serialize_relation(relation));
         }
         await this._file_handler.write_async(RELATION_SCHEMA_FILE, buffer);
+        // also rewrite attributes file
         buffer = []
         for await (const row of this._file_handler.stream_read_async(ATTRIBUTE_SCHEMA_FILE, ATTRIBUTE_CATALOG_DATATYPES)) {
             const attribute: AttributeCatalog = this._analyzer.deserialize_attribute(row);
@@ -36,6 +42,7 @@ export class AlterNameExecuter extends Executer {
             buffer.push(this._analyzer.serialize_attribute(attribute));
         }
         await this._file_handler.write_async(ATTRIBUTE_SCHEMA_FILE, buffer);
+        // rename data dir to the new name
         this._file_handler.rename_dir(TABLE_DIR(statement.name), TABLE_DIR(statement.new_name));
         return { type: "COMMAND", tag: "ALTER TABLE" }
     }
