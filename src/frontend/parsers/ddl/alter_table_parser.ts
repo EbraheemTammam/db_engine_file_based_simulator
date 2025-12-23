@@ -43,7 +43,7 @@ export class AlterTableParser extends Parser {
             data_type: ctype.value as string 
         }
         let next: Token = this.peek();
-        while (next.type !== TokenType.SEMICOLON) {
+        while (!this.is_eof() && next.type !== TokenType.SEMICOLON) {
             switch (next.value) {
                 case 'PRIMARY':
                     this.consume(TokenType.KEYWORD, 'PRIMARY');
@@ -74,8 +74,8 @@ export class AlterTableParser extends Parser {
                 default:
                     throw new SyntaxError(`unexpected token '${next.value}'`);
             }
+            next = this.peek();
         }
-        next = this.consume();
         column.constraints = {
             default: default_value,
             pk: pk,
