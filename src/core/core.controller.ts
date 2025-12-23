@@ -1,5 +1,6 @@
 import { Body, Controller, Post} from '@nestjs/common';
 import { CoreService } from './core.service';
+import { isInstance } from 'class-validator';
 
 @Controller('execute')
 export class CoreController {
@@ -21,7 +22,8 @@ export class CoreController {
                 error_with_location.slice(0, error_with_location.indexOf('(')) +
                 error_with_location.slice(error_with_location.indexOf(')') + 1, error_with_location.indexOf(')')) 
             );
-            console.error(`\x1b[31m[${now.toLocaleDateString()} ${now.toLocaleTimeString()}] [ERROR] SyntaxError: ${e.message}`);
+            let syntax_error: boolean = isInstance(e, SyntaxError);
+            console.error(`\x1b[31m[${now.toLocaleDateString()} ${now.toLocaleTimeString()}] [ERROR] ${syntax_error ? 'SyntaxError: ' : ''}${e.message}`);
             console.error(`\t\t\t\t${error_with_location}\x1b[0m`);
             return {'error': e.message}
         }
@@ -39,7 +41,8 @@ export class CoreController {
                 error_with_location.slice(0, error_with_location.indexOf('(')) +
                 error_with_location.slice(error_with_location.indexOf(')') + 1, error_with_location.indexOf(')')) 
             );
-            console.error(`\x1b[31m[${now.toLocaleDateString()} ${now.toLocaleTimeString()}] [ERROR] SyntaxError: ${e.message}`);
+            let syntax_error: boolean = isInstance(e, SyntaxError);
+            console.error(`\x1b[31m[${now.toLocaleDateString()} ${now.toLocaleTimeString()}] [ERROR] ${syntax_error ? 'SyntaxError: ' : ''}${e.message}`);
             console.error(`\t\t\t\t${error_with_location}\x1b[0m`);
             return {'error': e.message}
         }
